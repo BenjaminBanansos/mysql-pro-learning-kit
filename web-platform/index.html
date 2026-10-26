@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>MySQL Pro Academy | Intermediate to Staff DBA Learning Platform</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -653,6 +656,9 @@
                 <span>SQL Query Editor (WASM SQLite Engine)</span>
               </div>
               <div class="flex items-center space-x-2">
+                <button onclick="resetAndSeed1000Rows()" class="px-2.5 py-1 text-xs text-amber-300 hover:text-white bg-amber-950/80 hover:bg-amber-900 border border-amber-800 rounded transition-colors flex items-center" title="Force re-seed all tables with 1,000 AWS & GCP records">
+                  <i class="fa-solid fa-rotate mr-1"></i>Reset & Seed 1,000 Rows
+                </button>
                 <button onclick="clearEditor()" class="px-2.5 py-1 text-xs text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded transition-colors">
                   <i class="fa-solid fa-trash-can mr-1"></i>Clear
                 </button>
@@ -677,7 +683,11 @@
                 0 rows returned (0.00 ms)
               </div>
             </div>
-            <div class="overflow-x-auto max-h-96" id="result-table-container">
+            <!-- Results Pagination & Export Bar -->
+            <div id="results-pagination-bar" class="hidden bg-slate-950/80 px-4 py-2 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <!-- Injected by JS -->
+            </div>
+            <div class="overflow-x-auto max-h-[500px] overflow-y-auto" id="result-table-container">
               <div class="p-8 text-center text-slate-500 text-sm">
                 Write a query above and click <strong class="text-cyan-400">Run Query</strong> or select a Quick Sample query.
               </div>
@@ -862,7 +872,7 @@
     </div>
   </footer>
 
-  <script src="lessons-data.js"></script>
-  <script src="app.js"></script>
+  <script src="lessons-data.js?v=2.2.0"></script>
+  <script src="app.js?v=2.2.0"></script>
 </body>
 </html>

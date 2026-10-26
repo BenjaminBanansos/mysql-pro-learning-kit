@@ -158,6 +158,69 @@ const FLASHCARDS = [
 // ------------------------------------------------------------------------
 // 5. In-Memory Database Initialization (SQL.js)
 // ------------------------------------------------------------------------
+// Reusable Seeding Helpers for High-Volume Datasets (1,000+ Rows)
+// ------------------------------------------------------------------------
+function seed1000NYCTaxiTrips(targetDb) {
+  const dbInst = targetDb || db;
+  if (!dbInst) return;
+  const vendors = ["Creative Mobile", "VeriFone Inc", "NYC Fleet LLC", "GreenCab Metro"];
+  const payments = ["Credit Card", "Cash", "Credit Card", "Credit Card", "Cash"];
+  dbInst.run("BEGIN TRANSACTION;");
+  dbInst.run("DELETE FROM nyc_taxi_trips;");
+  for (let t = 1; t <= 1000; t++) {
+    const v = vendors[t % vendors.length];
+    const pmt = payments[t % payments.length];
+    const dist = (0.8 + ((t * 2.3) % 24)).toFixed(1);
+    const fare = (4.50 + (dist * 2.9)).toFixed(2);
+    const tip = pmt === "Credit Card" ? (fare * 0.20).toFixed(2) : "0.00";
+    const total = (parseFloat(fare) + parseFloat(tip) + 3.50).toFixed(2);
+    const m = ((t % 12) + 1).toString().padStart(2, '0');
+    const d = ((t % 28) + 1).toString().padStart(2, '0');
+    const hr = (8 + (t % 14)).toString().padStart(2, '0');
+    const mn = (t % 60).toString().padStart(2, '0');
+    const pickup = `2024-${m}-${d} ${hr}:${mn}:15`;
+    const dropoff = `2024-${m}-${d} ${hr}:${((parseInt(mn) + 18) % 60).toString().padStart(2, '0')}:45`;
+    dbInst.run(`INSERT INTO nyc_taxi_trips VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`, [
+      1000 + t, v, pickup, dropoff, (t % 4) + 1, parseFloat(dist), pmt, parseFloat(fare), parseFloat(tip), parseFloat(total)
+    ]);
+  }
+  dbInst.run("COMMIT;");
+}
+
+function seed1000AmazonReviews(targetDb) {
+  const dbInst = targetDb || db;
+  if (!dbInst) return;
+  const reviewProducts = [
+    { id: "PROD_AIRPODS", title: "Wireless Noise Canceling Earbuds", cat: "Wireless" },
+    { id: "PROD_KBD_MECH", title: "Mechanical Ergonomic RGB Keyboard", cat: "Electronics" },
+    { id: "PROD_USB_C_HUB", title: "7-in-1 Aluminum USB-C Hub Adapter", cat: "Electronics" },
+    { id: "PROD_CHAIR_ERGO", title: "Mesh Executive Office Swivel Chair", cat: "Home" },
+    { id: "PROD_MONITOR_4K", title: "34-Inch UltraWide Curved 4K Monitor", cat: "Electronics" },
+    { id: "PROD_WEBCAM_PRO", title: "1080P HD Auto-Focus Streaming Webcam", cat: "Computers" },
+    { id: "PROD_DESK_STAND", title: "Dual Motor Electric Standing Desk 60-inch", cat: "Home" },
+    { id: "PROD_MIC_USB", title: "Studio Condenser Cardioid USB Microphone", cat: "Audio" },
+    { id: "PROD_SSD_2TB", title: "PCIe NVMe Gen4 2TB Internal Solid State Drive", cat: "Computers" },
+    { id: "PROD_ROUTER_AX", title: "WiFi 6 Dual-Band Gigabit Mesh Router", cat: "Wireless" }
+  ];
+
+  dbInst.run("BEGIN TRANSACTION;");
+  dbInst.run("DELETE FROM amazon_reviews;");
+  for (let r = 1; r <= 1000; r++) {
+    const p = reviewProducts[r % reviewProducts.length];
+    const rating = ((r * 3) % 5) + 1;
+    const helpful = (r * 11) % 350;
+    const total = helpful + (r % 20);
+    const verified = (r % 7 !== 0) ? "Y" : "N";
+    const m = ((r % 12) + 1).toString().padStart(2, '0');
+    const d = ((r % 28) + 1).toString().padStart(2, '0');
+    const date = `2024-${m}-${d}`;
+    dbInst.run(`INSERT INTO amazon_reviews VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`, [
+      `R_${(10000 + r).toString()}`, p.id, p.title, p.cat, rating, helpful, total, verified, date
+    ]);
+  }
+  dbInst.run("COMMIT;");
+}
+
 async function initDatabase() {
   const statusBadge = document.getElementById('db-status-badge');
   try {
@@ -387,57 +450,10 @@ async function initDatabase() {
     `);
 
     // Seed AWS S3 NYC Taxi Trips (1,000 real records from s3://nyc-tlc/)
-    const vendors = ["Creative Mobile", "VeriFone Inc", "NYC Fleet LLC", "GreenCab Metro"];
-    const payments = ["Credit Card", "Cash", "Credit Card", "Credit Card", "Cash"];
-    db.run("BEGIN TRANSACTION;");
-    for (let t = 1; t <= 1000; t++) {
-      const v = vendors[t % vendors.length];
-      const pmt = payments[t % payments.length];
-      const dist = (0.8 + ((t * 2.3) % 24)).toFixed(1);
-      const fare = (4.50 + (dist * 2.9)).toFixed(2);
-      const tip = pmt === "Credit Card" ? (fare * 0.20).toFixed(2) : "0.00";
-      const total = (parseFloat(fare) + parseFloat(tip) + 3.50).toFixed(2);
-      const m = ((t % 12) + 1).toString().padStart(2, '0');
-      const d = ((t % 28) + 1).toString().padStart(2, '0');
-      const hr = (8 + (t % 14)).toString().padStart(2, '0');
-      const mn = (t % 60).toString().padStart(2, '0');
-      const pickup = `2024-${m}-${d} ${hr}:${mn}:15`;
-      const dropoff = `2024-${m}-${d} ${hr}:${((parseInt(mn) + 18) % 60).toString().padStart(2, '0')}:45`;
-      db.run(`INSERT INTO nyc_taxi_trips VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`, [
-        1000 + t, v, pickup, dropoff, (t % 4) + 1, parseFloat(dist), pmt, parseFloat(fare), parseFloat(tip), parseFloat(total)
-      ]);
-    }
-    db.run("COMMIT;");
+    seed1000NYCTaxiTrips(db);
 
     // Seed AWS S3 Amazon Customer Reviews (1,000 real records from s3://amazon-reviews-pds/)
-    const reviewProducts = [
-      { id: "PROD_AIRPODS", title: "Wireless Noise Canceling Earbuds", cat: "Wireless" },
-      { id: "PROD_KBD_MECH", title: "Mechanical Ergonomic RGB Keyboard", cat: "Electronics" },
-      { id: "PROD_USB_C_HUB", title: "7-in-1 Aluminum USB-C Hub Adapter", cat: "Electronics" },
-      { id: "PROD_CHAIR_ERGO", title: "Mesh Executive Office Swivel Chair", cat: "Home" },
-      { id: "PROD_MONITOR_4K", title: "34-Inch UltraWide Curved 4K Monitor", cat: "Electronics" },
-      { id: "PROD_WEBCAM_PRO", title: "1080P HD Auto-Focus Streaming Webcam", cat: "Computers" },
-      { id: "PROD_DESK_STAND", title: "Dual Motor Electric Standing Desk 60-inch", cat: "Home" },
-      { id: "PROD_MIC_USB", title: "Studio Condenser Cardioid USB Microphone", cat: "Audio" },
-      { id: "PROD_SSD_2TB", title: "PCIe NVMe Gen4 2TB Internal Solid State Drive", cat: "Computers" },
-      { id: "PROD_ROUTER_AX", title: "WiFi 6 Dual-Band Gigabit Mesh Router", cat: "Wireless" }
-    ];
-
-    db.run("BEGIN TRANSACTION;");
-    for (let r = 1; r <= 1000; r++) {
-      const p = reviewProducts[r % reviewProducts.length];
-      const rating = ((r * 3) % 5) + 1;
-      const helpful = (r * 11) % 350;
-      const total = helpful + (r % 20);
-      const verified = (r % 7 !== 0) ? "Y" : "N";
-      const m = ((r % 12) + 1).toString().padStart(2, '0');
-      const d = ((r % 28) + 1).toString().padStart(2, '0');
-      const date = `2024-${m}-${d}`;
-      db.run(`INSERT INTO amazon_reviews VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`, [
-        `R_${(10000 + r).toString()}`, p.id, p.title, p.cat, rating, helpful, total, verified, date
-      ]);
-    }
-    db.run("COMMIT;");
+    seed1000AmazonReviews(db);
 
     statusBadge.innerText = "Active (11 Tables Loaded)";
     renderSchemaExplorer();
@@ -599,13 +615,13 @@ function handleCloudConnectorQuery(query) {
   let dataset = 'nyc_taxi';
   let cloudSource = 's3://nyc-tlc/trip data/yellow_tripdata.parquet';
   let targetTable = 'nyc_taxi_trips';
-  let rowsIngested = 500;
+  let rowsIngested = 1000;
 
   if (upper.includes('AMAZON') || upper.includes('REVIEW')) {
     dataset = 'amazon_reviews';
     cloudSource = 's3://amazon-reviews-pds/tsv/amazon_reviews_us_Wireless.tsv.gz';
     targetTable = 'amazon_reviews';
-    rowsIngested = 500;
+    rowsIngested = 1000;
   } else if (upper.includes('STACK') || upper.includes('OVERFLOW')) {
     dataset = 'stack_overflow';
     cloudSource = 'bigquery-public-data.stackoverflow.posts_questions';
@@ -628,7 +644,7 @@ function handleCloudConnectorQuery(query) {
     rowsIngested = 250;
   }
 
-  // Ensure table exists in SQLite
+  // Ensure table exists and has 1,000 seeded rows
   try {
     if (dataset === 'nyc_taxi') {
       db.run(`CREATE TABLE IF NOT EXISTS nyc_taxi_trips (
@@ -643,6 +659,7 @@ function handleCloudConnectorQuery(query) {
         tip_amount REAL,
         total_amount REAL
       );`);
+      seed1000NYCTaxiTrips(db);
     } else if (dataset === 'amazon_reviews') {
       db.run(`CREATE TABLE IF NOT EXISTS amazon_reviews (
         review_id TEXT PRIMARY KEY,
@@ -655,21 +672,25 @@ function handleCloudConnectorQuery(query) {
         verified_purchase TEXT,
         review_date TEXT
       );`);
+      seed1000AmazonReviews(db);
     }
   } catch(e) {}
 
   const alertBox = document.getElementById('query-alert');
   if (alertBox) {
     alertBox.className = "p-3.5 rounded-xl bg-gradient-to-r from-emerald-950/90 to-slate-900 border border-emerald-600/80 text-emerald-200 text-xs font-mono block shadow-lg";
+    const queryDefault = targetTable === 'amazon_reviews' 
+      ? `SELECT * FROM amazon_reviews ORDER BY 9 DESC LIMIT 1000;` 
+      : `SELECT * FROM ${targetTable} ORDER BY 1 DESC LIMIT 1000;`;
     alertBox.innerHTML = `
       <div class="flex flex-wrap items-center justify-between gap-2">
         <span class="flex items-center font-bold">
           <i class="fa-solid fa-cloud-arrow-down text-emerald-400 mr-2 text-sm"></i>
-          [LIVE CLOUD CONNECTOR SUCCESS] Connected to ${cloudSource} • Streamed ${rowsIngested} records into '${targetTable}'.
+          [LIVE CLOUD CONNECTOR SUCCESS] Connected to ${cloudSource} • Streamed ${rowsIngested.toLocaleString()} records into '${targetTable}'.
         </span>
-        <button onclick="document.getElementById('sql-editor').value='SELECT * FROM ${targetTable} ORDER BY 1 DESC LIMIT 10;'; executeSQLQuery();" 
+        <button onclick="document.getElementById('sql-editor').value='${queryDefault}'; executeSQLQuery();" 
           class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] uppercase tracking-wider transition-all shadow">
-          Query ${targetTable} Now
+          Query ${rowsIngested.toLocaleString()} ${targetTable} Now
         </button>
       </div>
     `;
@@ -702,11 +723,169 @@ function runCloudIngestFromUI(dataset) {
   executeSQLQuery();
 }
 
+// ------------------------------------------------------------------------
+// Query Result Pagination & Table Rendering Engine
+// ------------------------------------------------------------------------
+let currentQueryResults = null;
+let queryCurrentPage = 1;
+let queryPageSize = 50; // default 50, can be 25, 50, 100, 500, or 'all'
+
+function setQueryPageSize(size) {
+  queryPageSize = size === 'all' ? 'all' : parseInt(size);
+  queryCurrentPage = 1;
+  renderPaginatedQueryResults();
+}
+
+function changeQueryPage(delta) {
+  if (!currentQueryResults) return;
+  const totalRows = currentQueryResults.values.length;
+  if (queryPageSize === 'all') return;
+  const pageSize = parseInt(queryPageSize);
+  const maxPage = Math.max(1, Math.ceil(totalRows / pageSize));
+  const newPage = queryCurrentPage + delta;
+  if (newPage >= 1 && newPage <= maxPage) {
+    queryCurrentPage = newPage;
+    renderPaginatedQueryResults();
+  }
+}
+
+function exportQueryResultsCSV() {
+  if (!currentQueryResults) return;
+  const { columns, values } = currentQueryResults;
+  const csvRows = [
+    columns.join(','),
+    ...values.map(r => r.map(v => typeof v === 'string' ? `"${v.replace(/"/g, '""')}"` : v).join(','))
+  ];
+  const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `query_results_${Date.now()}.csv`;
+  a.click();
+}
+
+function renderPaginatedQueryResults() {
+  if (!currentQueryResults) return;
+  const { columns, values, duration } = currentQueryResults;
+  const statsBox = document.getElementById('query-stats');
+  const resultContainer = document.getElementById('result-table-container');
+  const paginationBar = document.getElementById('results-pagination-bar');
+
+  const totalRows = values.length;
+  const isAll = queryPageSize === 'all';
+  const pageSize = isAll ? totalRows : parseInt(queryPageSize);
+  const totalPages = isAll ? 1 : Math.max(1, Math.ceil(totalRows / pageSize));
+  
+  if (queryCurrentPage > totalPages) queryCurrentPage = 1;
+  
+  const startIdx = isAll ? 0 : (queryCurrentPage - 1) * pageSize;
+  const endIdx = isAll ? totalRows : Math.min(startIdx + pageSize, totalRows);
+  const displayRows = values.slice(startIdx, endIdx);
+
+  if (statsBox) {
+    statsBox.innerHTML = `
+      <span class="inline-flex items-center px-2 py-0.5 rounded font-mono font-bold ${totalRows >= 1000 ? 'bg-cyan-950 text-cyan-300 border border-cyan-800' : 'text-slate-300'}">
+        <i class="fa-solid fa-list-check mr-1.5 text-cyan-400"></i>${totalRows.toLocaleString()} rows returned
+      </span>
+      <span class="text-slate-500 ml-1.5">(${duration} ms)</span>
+    `;
+  }
+
+  if (paginationBar) {
+    paginationBar.classList.remove('hidden');
+    paginationBar.innerHTML = `
+      <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-slate-300">
+        <span class="text-xs">
+          Showing <strong class="text-cyan-400 font-mono">${totalRows === 0 ? 0 : (startIdx + 1).toLocaleString()}</strong> to <strong class="text-cyan-400 font-mono">${endIdx.toLocaleString()}</strong> of <strong class="text-white font-mono">${totalRows.toLocaleString()}</strong> total rows
+        </span>
+        <span class="text-slate-600 hidden sm:inline">|</span>
+        <div class="flex items-center space-x-1">
+          <span class="text-slate-400 text-[11px]">Per page:</span>
+          ${[25, 50, 100, 500, 'all'].map(s => `
+            <button onclick="setQueryPageSize('${s}')" class="px-2 py-0.5 rounded text-[11px] font-mono transition-colors ${queryPageSize == s ? 'bg-cyan-600 text-white font-bold shadow-sm' : 'bg-slate-800 text-slate-400 hover:text-white'}">
+              ${s === 'all' ? `All (${totalRows.toLocaleString()})` : s}
+            </button>
+          `).join("")}
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button onclick="exportQueryResultsCSV()" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs transition-colors flex items-center shadow-sm">
+          <i class="fa-solid fa-file-csv mr-1 text-emerald-400"></i>CSV
+        </button>
+        ${!isAll && totalPages > 1 ? `
+          <div class="flex items-center space-x-1 pl-2 border-l border-slate-800">
+            <button onclick="changeQueryPage(-1)" ${queryCurrentPage === 1 ? 'disabled class="px-2 py-0.5 rounded bg-slate-900 text-slate-600 text-xs cursor-not-allowed"' : 'class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition-colors"'}>
+              <i class="fa-solid fa-angle-left"></i>
+            </button>
+            <span class="text-xs text-slate-400 font-mono px-1">Page ${queryCurrentPage} / ${totalPages}</span>
+            <button onclick="changeQueryPage(1)" ${queryCurrentPage === totalPages ? 'disabled class="px-2 py-0.5 rounded bg-slate-900 text-slate-600 text-xs cursor-not-allowed"' : 'class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition-colors"'}>
+              <i class="fa-solid fa-angle-right"></i>
+            </button>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  let tableHTML = `
+    <table class="w-full text-left text-xs font-mono border-collapse relative">
+      <thead class="sticky top-0 z-10 bg-slate-800/95 backdrop-blur-sm text-cyan-400 border-b border-slate-700 shadow-sm">
+        <tr>
+          <th class="p-2.5 font-semibold text-slate-500 w-14 text-center border-r border-slate-700/50">#</th>
+          ${columns.map(c => `<th class="p-2.5 font-semibold whitespace-nowrap">${c}</th>`).join("")}
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-800/80">
+  `;
+
+  tableHTML += displayRows.map((row, rIdx) => {
+    const rowNum = startIdx + rIdx + 1;
+    return `
+      <tr class="${rIdx % 2 === 0 ? 'bg-slate-950/60' : 'bg-slate-900/60'} hover:bg-cyan-950/20 transition-colors">
+        <td class="p-2.5 text-slate-500 text-center font-mono w-14 border-r border-slate-800/50 select-none">${rowNum}</td>
+        ${row.map(val => `<td class="p-2.5 text-slate-200 whitespace-nowrap">${val !== null ? val : '<span class="text-slate-600">NULL</span>'}</td>`).join("")}
+      </tr>
+    `;
+  }).join("");
+
+  tableHTML += `</tbody></table>`;
+  resultContainer.innerHTML = tableHTML;
+}
+
+async function resetAndSeed1000Rows() {
+  const alertBox = document.getElementById('query-alert');
+  const editor = document.getElementById('sql-editor');
+  try {
+    seed1000AmazonReviews(db);
+    seed1000NYCTaxiTrips(db);
+    renderSchemaExplorer();
+    if (alertBox) {
+      alertBox.className = "p-3 rounded-lg text-xs font-mono bg-emerald-950/80 border border-emerald-800 text-emerald-300 block";
+      alertBox.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span><i class="fa-solid fa-circle-check text-emerald-400 mr-2"></i><strong>Database Reset & Re-seeded!</strong> 1,000 Amazon Reviews and 1,000 NYC Taxi Trips preloaded.</span>
+          <span class="text-emerald-400 font-bold">1,000 Rows Ready</span>
+        </div>
+      `;
+    }
+    if (editor) {
+      editor.value = "SELECT * FROM amazon_reviews ORDER BY 9 DESC LIMIT 1000;";
+      executeSQLQuery();
+    }
+  } catch(e) {
+    if (alertBox) {
+      alertBox.className = "p-3 rounded-lg text-xs font-mono bg-red-950/80 border border-red-800 text-red-300 block";
+      alertBox.innerText = `Reset Error: ${e.message}`;
+    }
+  }
+}
+
 function executeSQLQuery() {
   const editor = document.getElementById('sql-editor');
   const alertBox = document.getElementById('query-alert');
   const statsBox = document.getElementById('query-stats');
   const resultContainer = document.getElementById('result-table-container');
+  const paginationBar = document.getElementById('results-pagination-bar');
 
   const query = editor.value.trim();
   if (!query) return;
@@ -726,6 +905,7 @@ function executeSQLQuery() {
     const connResult = handleCloudConnectorQuery(query);
     const duration = (performance.now() - startTime).toFixed(2);
     
+    if (paginationBar) paginationBar.classList.add('hidden');
     statsBox.innerText = `1 row returned (${duration} ms) • Cloud Stream Active`;
     
     const { columns, values } = connResult;
@@ -755,6 +935,7 @@ function executeSQLQuery() {
     const duration = (performance.now() - startTime).toFixed(2);
 
     if (results.length === 0) {
+      if (paginationBar) paginationBar.classList.add('hidden');
       statsBox.innerText = `0 rows affected (${duration} ms)`;
       resultContainer.innerHTML = `
         <div class="p-8 text-center text-slate-400 text-sm">
@@ -766,28 +947,14 @@ function executeSQLQuery() {
     }
 
     const { columns, values } = results[0];
-    statsBox.innerText = `${values.length} rows returned (${duration} ms)`;
-
-    let tableHTML = `
-      <table class="w-full text-left text-xs font-mono border-collapse">
-        <thead>
-          <tr class="bg-slate-800 text-cyan-400 border-b border-slate-700">
-            ${columns.map(c => `<th class="p-2.5 font-semibold">${c}</th>`).join("")}
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-800">
-    `;
-
-    tableHTML += values.map((row, rIdx) => `
-      <tr class="${rIdx % 2 === 0 ? 'bg-slate-950/60' : 'bg-slate-900/60'} hover:bg-slate-800/50">
-        ${row.map(val => `<td class="p-2.5 text-slate-200">${val !== null ? val : '<span class="text-slate-600">NULL</span>'}</td>`).join("")}
-      </tr>
-    `).join("");
-
-    tableHTML += `</tbody></table>`;
-    resultContainer.innerHTML = tableHTML;
+    currentQueryResults = { columns, values, duration };
+    queryCurrentPage = 1;
+    // Default to 50 rows per page if large result, else 'all'
+    queryPageSize = values.length > 100 ? 50 : 'all';
+    renderPaginatedQueryResults();
 
   } catch (err) {
+    if (paginationBar) paginationBar.classList.add('hidden');
     statsBox.innerText = "Execution failed";
     alertBox.className = "p-3 rounded-lg text-xs font-mono bg-red-950/80 border border-red-800 text-red-300 block";
     alertBox.innerText = `SQL Error: ${err.message}`;
