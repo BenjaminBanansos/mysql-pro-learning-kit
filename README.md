@@ -1,6 +1,6 @@
-# 🚀 MySQL Intermediate to Pro Learning Kit (Enterprise Scale: 5M+ Records)
+# 🚀 MySQL Intermediate to Pro Learning Kit (AWS Open Data Scale: 5M+ Records)
 
-A complete, production-grade learning suite and portfolio accelerator designed to take developers, data analysts, and software engineers from **intermediate SQL** to **Pro / Senior Database Architect & Staff Data Engineer** over a structured **6-month curriculum**, using millions of real & cloud data points.
+A complete, production-grade learning suite and portfolio accelerator designed to take developers, data analysts, and software engineers from **intermediate SQL** to **Pro / Senior Database Architect & Staff Data Engineer** over a structured **6-month curriculum**, powered directly by real-world datasets from the **[AWS Open Data Registry](https://registry.opendata.aws/)** (`s3://nyc-tlc/`, `s3://amazon-reviews-pds/`, OurAirports).
 
 ---
 
@@ -13,10 +13,14 @@ docker compose up -d
 - **MySQL 8.0 Engine**: `localhost:3306` (User: `root`, Password: `root_password_123`)
 - **Adminer Web GUI**: `http://localhost:8080` (System: `MySQL`, Server: `mysql-pro`, User: `root`, Pass: `root_password_123`)
 
-### 2. Generate Millions of Real-World Data Points
-Run the high-speed data generator (zero external pip dependencies required):
+### 2. Connect to AWS Open Data Registry or Generate Data
+Connect directly to public AWS S3 buckets (no AWS account required):
 ```bash
-# Standard mode generates ~4.6 Million rows across 6 tables in ~15 seconds:
+# Stream real public datasets from AWS Open Data Registry:
+python3 01-datasets/aws_open_data_connector.py --fetch aviation_airports
+python3 01-datasets/aws_open_data_connector.py --fetch nyc_taxi
+
+# Or generate 4.6 Million rows instantly in ~15 seconds:
 python3 01-datasets/generate_synthetic_millions.py --scale standard
 ```
 
@@ -26,11 +30,12 @@ Execute the bulk loading script using high-throughput session flags:
 docker exec -i mysql-pro-lab mysql -u root -proot_password_123 --local-infile=1 < 02-schemas/01_ecommerce_cloud_schema.sql
 docker exec -i mysql-pro-lab mysql -u root -proot_password_123 --local-infile=1 < 02-schemas/02_financial_ledger_schema.sql
 docker exec -i mysql-pro-lab mysql -u root -proot_password_123 --local-infile=1 < 02-schemas/03_partitioned_analytics_schema.sql
+docker exec -i mysql-pro-lab mysql -u root -proot_password_123 --local-infile=1 < 02-schemas/05_aws_open_data_schema.sql
 docker exec -i mysql-pro-lab mysql -u root -proot_password_123 --local-infile=1 < 02-schemas/04_load_data_scripts.sql
 ```
 
 ### 4. Launch the Interactive Web Learning Platform
-Start the in-browser Web Platform featuring an embedded SQL engine (WASM), 24-week tracker, and 50 interview flashcards:
+Start the in-browser Web Platform featuring an embedded SQL engine (WASM), 24-week course player, and 50 interview flashcards:
 ```bash
 bash run_web_platform.sh
 # Opens automatically at http://localhost:3333
@@ -47,16 +52,16 @@ The platform is deployed via automated GitHub Actions (`.github/workflows/deploy
 
 ---
 
-## 📅 The 6-Month Structured Curriculum
+## 📅 The 6-Month Structured Curriculum (Powered by AWS Open Data)
 
-| Month | Theme | Key Topics | Practical Deliverable |
+| Month | Theme | AWS Open Data Focus | Practical Deliverable |
 | :--- | :--- | :--- | :--- |
-| **Month 1** | **Advanced SQL & Analytical Querying** | Execution order, Hash joins, Window Functions (`DENSE_RANK`, `LAG`, `NTILE`), Recursive CTEs, MySQL 8 JSON & FTS | Cohort retention, RFM scoring, hierarchical referral trees |
-| **Month 2** | **InnoDB Internals & Deep Indexing** | Buffer Pool LRU, B+ Tree page splits, Clustered vs Secondary indexes, Covering Indexes, `EXPLAIN ANALYZE` | 100x query speedup lab, eliminating filesorts & bookmark lookups |
-| **Month 3** | **Concurrency, MVCC & Server Tuning** | ACID isolation, Record/Gap/Next-Key locks, Deadlock graph analysis, Slow Query Log, `my.cnf` tuning | Python multi-threaded deadlock stress test & canonical lock ordering |
-| **Month 4** | **Big Data Scaling & Partitioning** | `LOAD DATA INFILE`, RANGE/HASH partitioning, Partition Pruning, AWS S3 / NYC Taxi cloud datasets | 10M+ row partition pruning benchmark, sub-10ms data aging |
-| **Month 5** | **Replication, ProxySQL & HA** | GTID replication, Semi-sync, ProxySQL read/write splitting, Point-in-time recovery (PITR), RBAC security | Production ProxySQL routing configuration & automated PITR restore |
-| **Month 6** | **Portfolio Projects & Interview Drills** | Capstone project packaging, benchmark graphs, GitHub README polish, Resume integration, 50 Pro Q&As | 3 Standout Portfolio Repositories + Staff DBA/Backend Interview Mastery |
+| **Month 1** | **Advanced Analytical SQL** | Amazon Reviews (130M+ on AWS S3) & Transit | Cohort retention, RFM scoring, Boolean Full-Text Search (`+ - *`) |
+| **Month 2** | **InnoDB Internals & Deep Indexing** | AWS NYC Taxi (3M - 10M rows) | B+ tree leaf splits, covering index 100x speedup (1,850ms -> 12ms), `EXPLAIN ANALYZE` |
+| **Month 3** | **Concurrency, MVCC & Tuning** | High-throughput fare settlement & payment transactions | Multi-threaded deadlock stress test, canonical lock ordering (`LEAST`/`GREATEST`) |
+| **Month 4** | **Big Data Scaling & Partitioning** | AWS S3 (`s3://nyc-tlc/`) & Global Aviation GIS | `PARTITION BY RANGE COLUMNS(pickup_datetime)`, `ST_Distance_Sphere`, sub-10ms data aging |
+| **Month 5** | **Replication, ProxySQL & Cloud S3** | Native AWS Aurora `LOAD DATA FROM S3` | GTID replication, ProxySQL read/write splitting, Point-in-Time Recovery |
+| **Month 6** | **Portfolio Projects & Interview Drills** | 3 Production Capstones built on AWS Open Data | 3 Standout Portfolio Repositories + Staff DBA/Backend Interview Mastery |
 
 Detailed weekly syllabus documents are located in the [`00-curriculum/`](00-curriculum/) directory.
 

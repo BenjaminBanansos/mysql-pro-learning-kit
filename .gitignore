@@ -1,5 +1,7 @@
 # Large Data Files & Dumps
 01-datasets/*.csv
+01-datasets/*.raw
+*.raw
 *.log
 *.ibd
 backups/

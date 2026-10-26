@@ -14,67 +14,67 @@ let activeModalWeek = 1;
 const CURRICULUM = [
   {
     month: 1,
-    title: "Month 1: Advanced SQL & Analytical Querying",
-    focus: "Bridging intermediate SQL to advanced analytics, Window Functions, CTEs, JSON & FTS.",
+    title: "Month 1: Advanced Analytical SQL on AWS Open Data",
+    focus: "Bridging intermediate SQL to advanced analytics using AWS Open Data (Amazon Reviews & Transit).",
     weeks: [
-      { week: 1, title: "Logical Query Execution Order & Advanced Joins", desc: "Understanding the FROM -> WHERE -> GROUP BY -> SELECT order, Self Joins, Non-Equi Joins, and MySQL 8 Hash Joins." },
-      { week: 2, title: "Window Functions & Analytical Frameworks", desc: "ROW_NUMBER, RANK, DENSE_RANK, NTILE, LAG, LEAD, and sliding window frame specifications." },
-      { week: 3, title: "Recursive CTEs & Hierarchical Graph Queries", desc: "Recursive CTEs for multi-level organization hierarchies, referral trees, and dynamic date ranges." },
-      { week: 4, title: "MySQL 8 Native JSON & Full-Text Search", desc: "JSON extraction (->, ->>), JSON_TABLE relational projection, virtual column indexing, and Boolean Mode FTS." }
+      { week: 1, title: "Logical Query Execution Order & Advanced Joins", desc: "Understanding the FROM -> WHERE -> GROUP BY -> SELECT order, Self Joins, Non-Equi Joins, and MySQL 8 Hash Joins on AWS scale." },
+      { week: 2, title: "Window Functions & Analytical Transit Frameworks", desc: "ROW_NUMBER, RANK, DENSE_RANK, NTILE, LAG, LEAD, and sliding window frame specifications on millions of rows." },
+      { week: 3, title: "Recursive CTEs & Hierarchical Airport Networks", desc: "Recursive CTEs for multi-hop flight route networks, referral trees, and dynamic calendar date series." },
+      { week: 4, title: "MySQL 8 Native JSON & Full-Text Search (AWS Reviews)", desc: "JSON extraction (->, ->>), JSON_TABLE relational projection, virtual column indexing, and Boolean Mode FTS on 130M+ Amazon Reviews." }
     ]
   },
   {
     month: 2,
-    title: "Month 2: InnoDB Internals & Deep Indexing",
-    focus: "Mastering storage engine memory/disk architecture, B+ Tree mechanics, and EXPLAIN ANALYZE.",
+    title: "Month 2: InnoDB Internals & Deep Indexing on AWS Trips",
+    focus: "Mastering storage engine memory/disk architecture, B+ Tree mechanics, and EXPLAIN ANALYZE on 3M+ AWS Taxi Trips.",
     weeks: [
       { week: 5, title: "InnoDB Memory & Disk Structures", desc: "Buffer Pool LRU lists, Redo Log Buffer, Change Buffer, 16KB Page anatomy, and Doublewrite Buffer." },
-      { week: 6, title: "B+ Tree Anatomy & Leaf Page Splits", desc: "Clustered indexes vs secondary indexes, page fill factors, random I/O penalties, and index selectivity." },
-      { week: 7, title: "Covering Indexes & Leftmost Prefix Rule", desc: "Eliminating clustered index bookmark lookups, composite index ordering, and MySQL 8 Index Skip Scans." },
-      { week: 8, title: "Query Execution Plan Mastery (EXPLAIN ANALYZE)", desc: "Analyzing actual time vs estimated cost, loops, access types (ref, range, eq_ref), and eliminating filesorts." }
+      { week: 6, title: "B+ Tree Anatomy & Leaf Page Splits on Real Trips", desc: "Clustered indexes vs secondary indexes, page fill factors, random I/O penalties, and index selectivity on 3M+ trip records." },
+      { week: 7, title: "Covering Indexes & Leftmost Prefix Rule (100x Speedup)", desc: "Eliminating clustered index bookmark lookups on NYC Taxi queries, composite index ordering, and MySQL 8 Index Skip Scans." },
+      { week: 8, title: "Query Execution Plan Mastery (EXPLAIN ANALYZE)", desc: "Analyzing actual time vs estimated cost, loops, access types (ref, range, eq_ref), and eliminating filesorts on multi-million row tables." }
     ]
   },
   {
     month: 3,
-    title: "Month 3: Concurrency, MVCC & Server Tuning",
-    focus: "ACID isolation guarantees, row-level locking, deadlock prevention, and production tuning.",
+    title: "Month 3: Concurrency, MVCC & Transaction Tuning",
+    focus: "ACID isolation guarantees, row-level locking, deadlock prevention, and production tuning for high-throughput payment systems.",
     weeks: [
       { week: 9, title: "ACID, WAL & Crash Recovery Tuning", desc: "Undo log rollbacks, redo log WAL, and tuning innodb_flush_log_at_trx_commit vs sync_binlog for TPS." },
-      { week: 10, title: "Isolation Levels & MVCC Snapshot Mechanics", desc: "Read Committed vs Repeatable Read, DB_TRX_ID, DB_ROLL_PTR, and Read View lifecycle." },
+      { week: 10, title: "Isolation Levels & MVCC Snapshot Mechanics", desc: "Read Committed vs Repeatable Read, DB_TRX_ID, DB_ROLL_PTR, and Read View lifecycle under concurrent updates." },
       { week: 11, title: "Locking Internals & Deadlock Mastery", desc: "Record Locks, Gap Locks, Next-Key Locks, and mathematical deadlock immunity using canonical lock ordering." },
       { week: 12, title: "Production Server Tuning & Slow Query Logs", desc: "Buffer Pool sizing (70-80% RAM), pt-query-digest, slow query threshold profiling (long_query_time = 0.05)." }
     ]
   },
   {
     month: 4,
-    title: "Month 4: Big Data Scaling, Partitioning & Cloud",
-    focus: "Ingesting and managing tens of millions of records using partitioning and public cloud datasets.",
+    title: "Month 4: Big Data Scaling, Partitioning & AWS Open Data",
+    focus: "Ingesting and managing tens of millions of records using partitioning and public S3 datasets (s3://nyc-tlc/).",
     weeks: [
-      { week: 13, title: "High-Speed Bulk Ingestion Pipelines", desc: "Optimizing LOAD DATA LOCAL INFILE, bulk insert batching, and temporary constraint suspension." },
-      { week: 14, title: "Public Cloud Datasets & Spatial GIS SQL", desc: "AWS Open Data NYC Taxi and aviation data; R-Tree spatial indexes and ST_Distance_Sphere." },
-      { week: 15, title: "Table Partitioning Architecture", desc: "RANGE, LIST, and HASH partitioning; strict rules requiring partition keys in all unique/primary keys." },
-      { week: 16, title: "Partition Pruning & Zero-Downtime Data Aging", desc: "Proving partition elimination in EXPLAIN; instant sub-10ms data drops via ALTER TABLE DROP PARTITION." }
+      { week: 13, title: "High-Speed Bulk Ingestion from AWS Public S3", desc: "Optimizing LOAD DATA LOCAL INFILE, bulk insert batching, and streaming directly from AWS Open Data buckets in seconds." },
+      { week: 14, title: "AWS Open Data Ingestion & Spatial GIS SQL", desc: "AWS Open Data NYC Taxi and aviation data; R-Tree spatial indexes and ST_Distance_Sphere." },
+      { week: 15, title: "Table Partitioning Architecture on AWS Trips", desc: "RANGE, LIST, and HASH partitioning on NYC Taxi pickup dates; strict rules requiring partition keys in all unique/primary keys." },
+      { week: 16, title: "Partition Pruning & Zero-Downtime Data Aging", desc: "Proving partition elimination in EXPLAIN; instant sub-10ms data drops via ALTER TABLE DROP PARTITION without redo bloat." }
     ]
   },
   {
     month: 5,
-    title: "Month 5: High Availability, Replication & Security",
-    focus: "Multi-node replication, ProxySQL query routing, point-in-time disaster recovery, and RBAC.",
+    title: "Month 5: High Availability, Cloud Replication & AWS S3",
+    focus: "Multi-node replication, ProxySQL query routing, point-in-time disaster recovery, and native AWS Aurora S3 ingestion.",
     weeks: [
       { week: 17, title: "GTID-Based Replication & Semi-Sync", desc: "Row-based binary logging, three-thread replication architecture, and automated GTID failover." },
       { week: 18, title: "ProxySQL & Automated Read/Write Splitting", desc: "Connection multiplexing, routing SELECT ... FOR UPDATE to master, and shunning lagging replicas." },
       { week: 19, title: "Enterprise Backups & Point-in-Time Recovery", desc: "mysqldump --single-transaction, binlog coordinate extraction, and point-in-time recovery to the second." },
-      { week: 20, title: "Hardened Enterprise Security & Compliance", desc: "RBAC least-privilege roles, TLS encryption in transit, tablespace encryption at rest, and audit logs." }
+      { week: 20, title: "Native AWS Aurora S3 Ingestion & Cloud Security", desc: "Native LOAD DATA FROM S3 in Aurora/RDS, RBAC least-privilege roles, and TLS encryption in transit." }
     ]
   },
   {
     month: 6,
-    title: "Month 6: Capstone Portfolio Projects & Career Launch",
-    focus: "Benchmarking 3 production projects, GitHub showcase publishing, resume polishing, and interview drills.",
+    title: "Month 6: Capstone Portfolio Projects on AWS Open Data",
+    focus: "Benchmarking 3 production projects built on AWS Open Data, GitHub showcase publishing, resume polishing, and interview drills.",
     weeks: [
-      { week: 21, title: "Project 1: Multi-Tenant E-Commerce Analytics", desc: "Covering index 100x speedup verification, cohort retention heatmap, and automated MySQL event rollups." },
-      { week: 22, title: "Project 2: ACID Financial Ledger & Fraud Suite", desc: "Deadlock stress testing under 50 threads, zero-negative balances, and sliding-window AML fraud detection." },
-      { week: 23, title: "Project 3: Cloud HA & ProxySQL Load Testing", desc: "Multi-threaded benchmark runner measuring QPS, p50, p95, p99 latencies under load." },
+      { week: 21, title: "Project 1: NYC TLC Urban Transit Analytics Engine", desc: "Partitioned 3M+ trips from AWS S3, covering index 100x speedup verification, and automated nightly rollup aggregations." },
+      { week: 22, title: "Project 2: ACID Financial Ledger & Fare Settlement", desc: "Deadlock stress testing under 50 threads, zero-negative balances, and sliding-window AML fraud detection." },
+      { week: 23, title: "Project 3: Cloud HA, ProxySQL & AWS Aurora S3 Pipeline", desc: "Multi-threaded benchmark runner measuring QPS, p50, p95, p99 latencies and native S3 ingestion pipelines." },
       { week: 24, title: "Portfolio Launch, Resume Bullets & Mock Drills", desc: "Packaging GitHub repos, publishing LinkedIn technical breakdown, and drilling all 50 Pro interview Q&As." }
     ]
   }
@@ -1432,22 +1432,22 @@ function sendLabToPlayground(labId) {
 // ------------------------------------------------------------------------
 const PORTFOLIO_PROJECTS = [
   {
-    title: "Project 1: Multi-Tenant E-Commerce Analytics",
-    scale: "5,000,000+ Orders & JSON Telemetry",
-    highlight: "100x Query Speedup (1,850ms -> 18ms)",
-    desc: "Engineered covering composite indexes and generated virtual columns for JSON clickstream telemetry, powering real-time cohort retention heatmaps and automated materialized rollups."
+    title: "Project 1: NYC TLC Urban Transit Analytics Engine",
+    scale: "AWS Open Data: 3,000,000+ Real S3 Trips",
+    highlight: "100x Speedup (1,850ms -> 12ms)",
+    desc: "Ingested and partitioned 3M+ real NYC Taxi records from s3://nyc-tlc/. Engineered covering composite indexes on (pickup_datetime, total_amount), eliminating clustered index bookmark lookups with sub-50ms analytical rollups."
   },
   {
-    title: "Project 2: Ultra-High-Throughput ACID Ledger",
-    scale: "1,000,000+ Double-Entry Transactions",
+    title: "Project 2: Ultra-High-Throughput ACID Financial Ledger",
+    scale: "1,000,000+ Concurrent Fare Settlements",
     highlight: "100% Deadlock-Free Guarantee",
     desc: "Implemented atomic stored procedures with canonical lock ordering (LEAST/GREATEST), eliminating Error 1213 deadlocks under 50 concurrent threads with sliding-window AML fraud detection."
   },
   {
-    title: "Project 3: Cloud HA & ProxySQL Read/Write Split",
+    title: "Project 3: Cloud HA, ProxySQL & AWS Aurora S3 Pipeline",
     scale: "5,000 Client Connections Multiplexed",
-    highlight: "20x Concurrency Boost, < 3s Failover",
-    desc: "Configured ProxySQL layer routing SELECT FOR UPDATE to master and load-balancing reads across GTID read replicas with automated replication lag mitigation."
+    highlight: "Native S3 Ingestion + < 3s Failover",
+    desc: "Engineered high-availability cloud database routing writes to master and load-balancing reads across GTID read replicas, paired with native AWS Aurora LOAD DATA FROM S3 pipelines."
   }
 ];
 

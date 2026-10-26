@@ -1,14 +1,14 @@
-# Month 3: Transactions, Locking, MVCC & Server Tuning (Weeks 9 - 12)
+# Month 3: Concurrency, MVCC & Transaction Tuning (Weeks 9 - 12)
 
 ## Objective
-Attain Staff Database Engineer proficiency in multi-threaded concurrency, row-level locking, deadlock diagnostics, and production server performance tuning.
+Attain Staff Database Engineer proficiency in multi-threaded concurrency, row-level locking, deadlock diagnostics, and production server performance tuning under high-frequency transaction loads.
 
 ---
 
 ### Week 9: ACID, WAL & Crash Recovery
 - **ACID Deep Dive**:
   - Atomicity: Undo log rollback mechanics.
-  - Consistency: Schema constraints, foreign keys, application state transitions.
+  - Consistency: Check constraints, foreign keys, application state transitions.
   - Isolation: Mitigating dirty reads, non-repeatable reads, and phantom reads.
   - Durability: Write-Ahead Logging (WAL) and `fsync()` guarantees.
 - **Tuning Durability vs Throughput**:
@@ -34,7 +34,7 @@ Attain Staff Database Engineer proficiency in multi-threaded concurrency, row-le
   - Deciphering `SHOW ENGINE INNODB STATUS`.
   - Interpreting the "LATEST DETECTED DEADLOCK" graph.
   - The Canonical Solution: Deterministic Lock Ordering (`LEAST`/`GREATEST`).
-- **Hands-On Exercises**:
+- **Hands-On Lab**:
   - Run `03-labs-and-exercises/lab04_deadlock_and_concurrency.py`.
 
 ### Week 12: Production Server Tuning & Observability
