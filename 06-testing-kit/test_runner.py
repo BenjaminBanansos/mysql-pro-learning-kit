@@ -55,6 +55,7 @@ class TestSuiteRunner:
                 email TEXT UNIQUE,
                 first_name TEXT,
                 last_name TEXT,
+                full_name TEXT,
                 tier TEXT,
                 created_at TEXT
             );
@@ -112,8 +113,8 @@ class TestSuiteRunner:
         for i in range(1, 101):
             tier = "GOLD" if i % 4 == 0 else "SILVER" if i % 2 == 0 else "STANDARD"
             self.cursor.execute(
-                "INSERT INTO customers VALUES (?, ?, ?, ?, ?, ?)",
-                (i, f"user_{i}@example.com", f"User{i}", "Test", tier, "2023-01-15")
+                "INSERT INTO customers VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (i, f"user_{i}@example.com", f"User{i}", "Test", f"User{i} Test", tier, "2023-01-15")
             )
 
         # Seed Products

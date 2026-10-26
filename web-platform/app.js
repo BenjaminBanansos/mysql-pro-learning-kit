@@ -175,6 +175,7 @@ async function initDatabase() {
         email TEXT UNIQUE,
         first_name TEXT,
         last_name TEXT,
+        full_name TEXT,
         country TEXT,
         city TEXT,
         tier TEXT,
@@ -274,17 +275,43 @@ async function initDatabase() {
         verified_purchase TEXT,
         review_date TEXT
       );
+
+      CREATE TABLE IF NOT EXISTS cloud_datasets (
+        dataset_id INTEGER PRIMARY KEY,
+        dataset_name TEXT,
+        cloud_provider TEXT,
+        bucket_uri TEXT,
+        format TEXT,
+        record_count INTEGER,
+        compression TEXT
+      );
     `);
 
     const countries = ["USA", "GBR", "DEU", "CAN", "FRA", "IND", "AUS", "SGP"];
     const tiers = ["STANDARD", "SILVER", "GOLD", "PLATINUM"];
+    const firstNames = ["James", "Emma", "Liam", "Olivia", "Noah", "Ava", "William", "Sophia", "Lucas", "Isabella"];
+    const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez"];
     for (let i = 1; i <= 50; i++) {
       const c = countries[i % countries.length];
       const t = tiers[i % tiers.length];
-      db.run(`INSERT INTO customers VALUES (?, ?, ?, ?, ?, ?, ?, ?);`, [
-        i, `user.${i}@example.com`, `FirstName${i}`, `LastName${i}`, c, "Metro City", t, `2023-0${(i % 9) + 1}-15`
+      const fn = firstNames[i % firstNames.length];
+      const ln = lastNames[i % lastNames.length];
+      const fullName = `${fn} ${ln}`;
+      db.run(`INSERT INTO customers VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`, [
+        i, `user.${i}@example.com`, fn, ln, fullName, c, "Metro City", t, `2023-0${(i % 9) + 1}-15`
       ]);
     }
+
+    db.run(`INSERT INTO cloud_datasets VALUES
+      (1, 'NYC Yellow Taxi Trips', 'AWS S3', 's3://nyc-tlc/trip data/', 'Parquet', 1500000000, 'Snappy'),
+      (2, 'Amazon Customer Reviews', 'AWS S3', 's3://amazon-reviews-pds/tsv/', 'TSV / CSV', 130000000, 'Gzip'),
+      (3, 'GitHub Open Archive', 'Google Cloud BigQuery', 'bigquery-public-data.github_repos', 'Columnar (Capacitor)', 10000000, 'LZ4'),
+      (4, 'Stack Overflow Posts', 'Google Cloud BigQuery', 'bigquery-public-data.stackoverflow', 'Columnar (Capacitor)', 50000000, 'LZ4'),
+      (5, 'Bitcoin Blockchain Ledger', 'Google Cloud BigQuery', 'bigquery-public-data.crypto_bitcoin', 'Columnar', 900000000, 'Snappy'),
+      (6, 'Hugging Face FineWeb LLM', 'Hugging Face Hub', 'hf://datasets/HuggingFaceFW/fineweb', 'Parquet', 15000000000, 'Zstandard'),
+      (7, 'Common Crawl Web Scrapes', 'AWS S3', 's3://commoncrawl/', 'WARC / WET', 3500000000, 'Gzip'),
+      (8, 'Global Weather Observations', 'AWS S3 / NOAA', 's3://noaa-global-hourly-pds/', 'CSV', 750000000, 'Gzip');
+    `);
 
     const categories = ["Electronics", "Fitness", "Home & Kitchen", "Books", "Fashion"];
     for (let i = 1; i <= 25; i++) {
@@ -447,7 +474,9 @@ function renderSchemaExplorer() {
   if (!db) return;
 
   const sampleTables = [
-        { name: "nyc_taxi_trips (AWS S3)", count: "500 rows", size: "48 KB", cols: ["trip_id (PK)", "pickup_dt", "trip_distance", "total_amount"] },
+    { name: "customers", count: "50 rows", size: "16 KB", cols: ["customer_id (PK)", "full_name", "email", "country", "city", "tier"] },
+    { name: "cloud_datasets (Catalog)", count: "8 datasets", size: "16 KB", cols: ["dataset_id (PK)", "dataset_name", "cloud_provider", "format", "record_count"] },
+    { name: "nyc_taxi_trips (AWS S3)", count: "500 rows", size: "48 KB", cols: ["trip_id (PK)", "pickup_dt", "trip_distance", "total_amount"] },
     { name: "amazon_reviews (AWS S3)", count: "500 rows", size: "64 KB", cols: ["review_id (PK)", "product_title", "star_rating", "helpful_votes"] },
     { name: "github_commits (Google Cloud)", count: "4 rows", size: "8 KB", cols: ["commit_sha (PK)", "parent_sha", "author_name", "message"] },
     { name: "so_posts (Google Cloud)", count: "4 rows", size: "8 KB", cols: ["post_id (PK)", "post_type_id", "score", "tags"] },
@@ -455,7 +484,6 @@ function renderSchemaExplorer() {
     { name: "fineweb_pretrain_docs (AI)", count: "4 rows", size: "8 KB", cols: ["doc_id (PK)", "source_corpus", "token_count", "educational_score"] },
     { name: "orders", count: "150 rows", size: "32 KB", cols: ["order_id (PK)", "customer_id", "order_date", "total_amount"] },
     { name: "order_items", count: "250 rows", size: "48 KB", cols: ["item_id (PK)", "order_id", "product_id", "subtotal"] },
-    { name: "customers", count: "50 rows", size: "12 KB", cols: ["customer_id (PK)", "email", "country", "tier"] },
     { name: "products", count: "25 rows", size: "8 KB", cols: ["product_id (PK)", "sku", "category", "base_price"] },
     { name: "accounts", count: "50 rows", size: "10 KB", cols: ["account_id (PK)", "customer_id", "current_balance"] }
   ];
