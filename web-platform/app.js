@@ -1066,6 +1066,14 @@ function setScaleMode(mode) {
   renderSchemaExplorer();
 }
 
+function openCloudDockerModal() {
+  document.getElementById('cloud-docker-modal').classList.remove('hidden');
+}
+
+function closeCloudDockerModal() {
+  document.getElementById('cloud-docker-modal').classList.add('hidden');
+}
+
 function openCapacityModal() {
   document.getElementById('capacity-modal').classList.remove('hidden');
 }

@@ -1,0 +1,32 @@
+{
+  "name": "MySQL Pro Learning Kit (Free Cloud Docker)",
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "forwardPorts": [3306, 8080, 3333],
+  "portsAttributes": {
+    "3306": {
+      "label": "MySQL 8.0 Database Engine",
+      "onAutoForward": "notify"
+    },
+    "8080": {
+      "label": "Adminer Web GUI",
+      "onAutoForward": "openBrowser"
+    },
+    "3333": {
+      "label": "Interactive Web Platform",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "cweijan.vscode-mysql-client2",
+        "ms-python.python",
+        "formulahendry.code-runner"
+      ]
+    }
+  },
+  "postCreateCommand": "docker compose up -d && python3 01-datasets/cloud_public_datasets_connector.py --list"
+}

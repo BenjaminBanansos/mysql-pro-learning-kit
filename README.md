@@ -5,6 +5,11 @@ A complete, production-grade learning suite and portfolio accelerator designed t
 - **Google Cloud Public Datasets (BigQuery)**: GitHub Public Archive (TBs of commits & file trees), Stack Overflow (50M+ QA pairs), Bitcoin & Ethereum Blockchain Ledger (1.5 TB+).
 - **Hugging Face Hub (AI Corpora)**: FineWeb (15 Trillion Tokens, 44+ TB) & RedPajama used for LLM pretraining data engineering in MySQL.
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/BenjaminBanansos/mysql-pro-learning-kit)
+
+> [!TIP]
+> **Free Cloud Docker (Zero Local Setup)**: Click **Open in GitHub Codespaces** above to automatically spin up a dedicated cloud VM with Docker, MySQL 8.0, and Adminer Web GUI in Microsoft Azure cloud (60 hours/month free for all GitHub users)!
+
 ---
 
 ## ⚡ Quick Start (Up and Running in 60 Seconds)
