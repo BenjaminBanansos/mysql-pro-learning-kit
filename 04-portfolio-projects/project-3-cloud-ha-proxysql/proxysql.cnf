@@ -1,0 +1,84 @@
+# ========================================================================
+# ProxySQL Configuration File: Production Read/Write Splitting
+# Target: Master (Hostgroup 10) & Read Replicas (Hostgroup 20)
+# ========================================================================
+
+datadir="/var/lib/proxysql"
+
+admin_variables = {
+    admin_credentials="admin:admin_secret_pass"
+    mysql_ifaces="0.0.0.0:6032"
+}
+
+mysql_variables = {
+    threads=4
+    max_connections=5000
+    default_query_delay=0
+    default_query_timeout=36000000
+    have_compress=true
+    poll_timeout=2000
+    interfaces="0.0.0.0:6033"
+    default_schema="analytics_db"
+    stacksize=1048576
+    connect_timeout_server=3000
+    monitor_username="monitor"
+    monitor_password="monitor_password"
+    monitor_interval_ms=1000
+    monitor_history_ms=600000
+    monitor_writer_is_also_reader=false
+}
+
+# Backend MySQL Server Definitions
+mysql_servers = (
+    # Hostgroup 10: Primary Master (Write-heavy)
+    {
+        address="mysql-primary"
+        port=3306
+        hostgroup=10
+        max_connections=200
+        weight=1000
+    },
+    # Hostgroup 20: Read Replicas (Read-heavy horizontal pool)
+    {
+        address="mysql-replica-01"
+        port=3306
+        hostgroup=20
+        max_connections=200
+        weight=100
+    },
+    {
+        address="mysql-replica-02"
+        port=3306
+        hostgroup=20
+        max_connections=200
+        weight=100
+    }
+)
+
+# Intelligent Query Routing Rules (Regex matching)
+mysql_query_rules = (
+    # Rule 1: Route SELECT ... FOR UPDATE to Master Hostgroup 10
+    {
+        rule_id=1
+        active=1
+        match_pattern="^SELECT.*FOR UPDATE"
+        destination_hostgroup=10
+        apply=1
+    },
+    # Rule 2: Route all other SELECT queries to Read Replica Hostgroup 20
+    {
+        rule_id=2
+        active=1
+        match_pattern="^SELECT"
+        destination_hostgroup=20
+        apply=1
+    },
+    # Rule 3: Default fallback (INSERT, UPDATE, DELETE, DDL) to Master Hostgroup 10
+    {
+        rule_id=3
+        active=1
+        match_pattern=".*"
+        destination_hostgroup=10
+        apply=1
+    }
+)

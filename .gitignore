@@ -1,0 +1,19 @@
+# Large Data Files & Dumps
+01-datasets/*.csv
+*.log
+*.ibd
+backups/
+
+# System & OS
+.DS_Store
+Thumbs.db
+
+# Node / Web Build
+node_modules/
+dist/
+.cache/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/

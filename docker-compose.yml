@@ -1,0 +1,37 @@
+services:
+  mysql-pro:
+    image: mysql:8.0.36
+    container_name: mysql-pro-lab
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password_123
+      MYSQL_DATABASE: analytics_db
+      MYSQL_USER: pro_student
+      MYSQL_PASSWORD: student_secure_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./my.cnf:/etc/mysql/conf.d/my.cnf:ro
+      - mysql_data:/var/lib/mysql
+      - ./02-schemas:/docker-entrypoint-initdb.d:ro
+      - ./01-datasets:/var/lib/mysql-files:rw
+    command: --local-infile=1
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password_123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  adminer:
+    image: adminer:latest
+    container_name: mysql-adminer-ui
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql-pro:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
+    driver: local
