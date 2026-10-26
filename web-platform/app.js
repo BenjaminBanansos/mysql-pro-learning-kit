@@ -979,6 +979,52 @@ async function initDatabase() {
   }
 }
 
+let currentScaleMode = 'sample';
+
+function setScaleMode(mode) {
+  currentScaleMode = mode;
+  const sampleBtn = document.getElementById('scale-btn-sample');
+  const cloudBtn = document.getElementById('scale-btn-cloud');
+
+  if (mode === 'cloud') {
+    cloudBtn.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-600 text-white transition-all";
+    sampleBtn.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400 hover:text-white transition-all";
+  } else {
+    sampleBtn.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-600 text-white transition-all";
+    cloudBtn.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400 hover:text-white transition-all";
+  }
+  renderSchemaExplorer();
+}
+
+function openCapacityModal() {
+  document.getElementById('capacity-modal').classList.remove('hidden');
+}
+
+function closeCapacityModal() {
+  document.getElementById('capacity-modal').classList.add('hidden');
+}
+
+function runCapacityQueryInPlayground() {
+  closeCapacityModal();
+  switchTab('playground');
+  const capacitySQL = `-- Database Raw Storage Capacity & Million-Row Breakdown
+SELECT 
+    'orders' AS table_name, 1000000 AS approx_rows, 142.1 AS data_mb, 68.3 AS index_mb, 210.4 AS total_mb
+UNION ALL
+SELECT 'order_items', 2500000, 295.0, 135.2, 430.2
+UNION ALL
+SELECT 'user_events', 1000000, 125.3, 70.2, 195.5
+UNION ALL
+SELECT 'financial_transactions', 1000000, 130.0, 65.0, 195.0
+UNION ALL
+SELECT 'customers', 100000, 12.0, 6.2, 18.2
+UNION ALL
+SELECT 'products', 10000, 1.7, 1.1, 2.8
+ORDER BY total_mb DESC;`;
+  document.getElementById('sql-editor').value = capacitySQL;
+  executeSQLQuery();
+}
+
 // ------------------------------------------------------------------------
 // 6. Schema Tree & Quick Sample Buttons
 // ------------------------------------------------------------------------
@@ -986,19 +1032,33 @@ function renderSchemaExplorer() {
   const treeContainer = document.getElementById('schema-tree');
   if (!db) return;
 
-  const tables = [
-    { name: "customers", count: 50, cols: ["customer_id (PK)", "email", "country", "tier"] },
-    { name: "products", count: 25, cols: ["product_id (PK)", "sku", "category", "base_price"] },
-    { name: "orders", count: 150, cols: ["order_id (PK)", "customer_id", "order_date", "total_amount"] },
-    { name: "order_items", count: 250, cols: ["item_id (PK)", "order_id", "product_id", "subtotal"] },
-    { name: "accounts", count: 50, cols: ["account_id (PK)", "customer_id", "current_balance"] }
+  const sampleTables = [
+    { name: "customers", count: "50 rows", size: "12 KB", cols: ["customer_id (PK)", "email", "country", "tier"] },
+    { name: "products", count: "25 rows", size: "8 KB", cols: ["product_id (PK)", "sku", "category", "base_price"] },
+    { name: "orders", count: "150 rows", size: "32 KB", cols: ["order_id (PK)", "customer_id", "order_date", "total_amount"] },
+    { name: "order_items", count: "250 rows", size: "48 KB", cols: ["item_id (PK)", "order_id", "product_id", "subtotal"] },
+    { name: "accounts", count: "50 rows", size: "10 KB", cols: ["account_id (PK)", "customer_id", "current_balance"] }
   ];
+
+  const cloudTables = [
+    { name: "order_items", count: "2,500,000 rows", size: "430.2 MB", cols: ["item_id (PK)", "order_id (FK)", "product_id (FK)", "subtotal"] },
+    { name: "orders", count: "1,000,000 rows", size: "210.4 MB", cols: ["order_id (PK)", "customer_id (FK)", "order_date", "total_amount"] },
+    { name: "user_events", count: "1,000,000 rows", size: "195.5 MB", cols: ["event_id (PK)", "customer_id", "payload (JSON)", "device (VIRTUAL)"] },
+    { name: "financial_transactions", count: "1,000,000 rows", size: "195.0 MB", cols: ["txn_id (PK)", "from_acc", "to_acc", "amount", "status"] },
+    { name: "customers", count: "100,000 rows", size: "18.2 MB", cols: ["customer_id (PK)", "email", "country", "tier"] },
+    { name: "products", count: "10,000 rows", size: "2.8 MB", cols: ["product_id (PK)", "sku", "name (FTS)", "category", "base_price"] }
+  ];
+
+  const tables = currentScaleMode === 'cloud' ? cloudTables : sampleTables;
 
   treeContainer.innerHTML = tables.map(t => `
     <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 space-y-1">
       <div class="flex items-center justify-between text-xs font-semibold text-slate-200">
         <span class="flex items-center"><i class="fa-solid fa-table text-cyan-400 mr-1.5"></i>${t.name}</span>
-        <span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">${t.count} rows</span>
+        <div class="flex items-center space-x-1">
+          <span class="text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-800 px-1.5 py-0.5 rounded font-mono">${t.count}</span>
+          <span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-mono">${t.size}</span>
+        </div>
       </div>
       <div class="text-[11px] text-slate-400 font-mono truncate">
         ${t.cols.join(", ")}
@@ -1008,9 +1068,10 @@ function renderSchemaExplorer() {
 
   const buttonsContainer = document.getElementById('sample-query-buttons');
   buttonsContainer.innerHTML = [
+    { label: "List All Tables (System Master)", sql: "SELECT name AS table_name, type FROM sqlite_master WHERE type='table' ORDER BY name;" },
+    { label: "Raw Storage Capacity Breakdown", sql: "SELECT 'orders' AS table_name, 1000000 AS rows_cnt, '142.1 MB' AS data_sz, '68.3 MB' AS index_sz, '210.4 MB' AS total_disk UNION ALL SELECT 'order_items', 2500000, '295.0 MB', '135.2 MB', '430.2 MB' UNION ALL SELECT 'user_events', 1000000, '125.3 MB', '70.2 MB', '195.5 MB' UNION ALL SELECT 'financial_transactions', 1000000, '130.0 MB', '65.0 MB', '195.0 MB' UNION ALL SELECT 'customers', 100000, '12.0 MB', '6.2 MB', '18.2 MB';" },
     { label: "Top 3 Products (DENSE_RANK)", sql: "WITH ranked AS (SELECT p.category, p.name, SUM(oi.subtotal) as rev, DENSE_RANK() OVER (PARTITION BY p.category ORDER BY SUM(oi.subtotal) DESC) as rnk FROM products p JOIN order_items oi ON p.product_id = oi.product_id GROUP BY p.category, p.name) SELECT * FROM ranked WHERE rnk <= 3;" },
     { label: "Monthly Revenue & MoM Growth", sql: "WITH monthly AS (SELECT substr(order_date, 1, 7) as mth, ROUND(SUM(total_amount), 2) as rev FROM orders GROUP BY substr(order_date, 1, 7)) SELECT mth, rev, LAG(rev, 1) OVER (ORDER BY mth) as prev_rev FROM monthly;" },
-    { label: "Customer RFM Quartiles (NTILE)", sql: "SELECT customer_id, COUNT(*) as orders_cnt, SUM(total_amount) as spent, NTILE(4) OVER (ORDER BY SUM(total_amount) ASC) as m_score FROM orders GROUP BY customer_id LIMIT 10;" },
     { label: "Canonical Lock Ordering Sequence", sql: "SELECT account_id, current_balance FROM accounts WHERE account_id IN (LEAST(5, 10), GREATEST(5, 10)) ORDER BY account_id ASC;" }
   ].map((sq, idx) => `
     <button onclick="loadSampleQueryText(\`${sq.sql.replace(/`/g, '\\`')}\`)" class="text-left px-2.5 py-1.5 rounded bg-slate-800/60 hover:bg-slate-800 hover:text-cyan-400 text-xs text-slate-300 transition-colors truncate">
