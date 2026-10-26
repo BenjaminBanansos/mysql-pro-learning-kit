@@ -38,22 +38,12 @@ bash run_web_platform.sh
 
 ---
 
-## 🌐 Deploy to GitHub & GitHub Pages
+## 🌐 Live Web Learning Platform & GitHub Repository
 
-This repository includes a pre-configured GitHub Actions workflow (`.github/workflows/deploy-pages.yml`) that automatically builds and publishes the **Interactive Web Learning Platform** to **GitHub Pages** on every push!
+- **GitHub Repository**: [https://github.com/BenjaminBanansos/mysql-pro-learning-kit](https://github.com/BenjaminBanansos/mysql-pro-learning-kit)
+- **Live Interactive Web Platform**: [https://BenjaminBanansos.github.io/mysql-pro-learning-kit/](https://BenjaminBanansos.github.io/mysql-pro-learning-kit/)
 
-### How to Connect to Your GitHub Account:
-1. Create a new repository on [GitHub](https://github.com/new) (e.g., `mysql-pro-kit`).
-2. Run the following commands in your terminal:
-```bash
-git remote add origin https://github.com/<YOUR-USERNAME>/<YOUR-REPO-NAME>.git
-git push -u origin main
-```
-3. Enable GitHub Pages:
-   - On GitHub, go to **Settings** -> **Pages**.
-   - Under **Build and deployment**, select **Source: GitHub Actions**.
-4. Your live Web Learning Platform will immediately be live at:
-   `https://<YOUR-USERNAME>.github.io/<YOUR-REPO-NAME>/`
+The platform is deployed via automated GitHub Actions (`.github/workflows/deploy-pages.yml`), enabling students and hiring managers to explore the 6-month curriculum, run live SQL queries in-browser via WebAssembly, test tuning benchmarks, and view capstone projects without installing anything!
 
 ---
 
