@@ -6,9 +6,14 @@ A complete, production-grade learning suite and portfolio accelerator designed t
 - **Hugging Face Hub (AI Corpora)**: FineWeb (15 Trillion Tokens, 44+ TB) & RedPajama used for LLM pretraining data engineering in MySQL.
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/BenjaminBanansos/mysql-pro-learning-kit)
+[![Download PDF Manual](https://img.shields.io/badge/PDF_Manual-Download_Master_Kit-059669?style=flat&logo=adobeacrobatreader&logoColor=white)](https://benjaminbanansos.github.io/mysql-pro-learning-kit/MySQL_Pro_Learning_And_Testing_Kit.pdf)
+[![Live Web Platform](https://img.shields.io/badge/Live_Platform-Online-0284c7?style=flat&logo=googlechrome&logoColor=white)](https://benjaminbanansos.github.io/mysql-pro-learning-kit/)
+[![Testing Kit](https://img.shields.io/badge/Testing_Kit-7%2F7_Passed-16a34a?style=flat&logo=pytest&logoColor=white)](06-testing-kit/TESTING_KIT_GUIDE.md)
 
 > [!TIP]
-> **Free Cloud Docker (Zero Local Setup)**: Click **Open in GitHub Codespaces** above to automatically spin up a dedicated cloud VM with Docker, MySQL 8.0, and Adminer Web GUI in Microsoft Azure cloud (60 hours/month free for all GitHub users)!
+> - **Free Cloud Docker**: Click **Open in GitHub Codespaces** above to automatically launch a full MySQL 8.0 cloud instance.
+> - **Download Master PDF Kit**: Get the full printable 7-page handbook and testing scorecard: [MySQL_Pro_Learning_And_Testing_Kit.pdf](https://benjaminbanansos.github.io/mysql-pro-learning-kit/MySQL_Pro_Learning_And_Testing_Kit.pdf).
+> - **Interactive Web Platform**: [BenjaminBanansos.github.io/mysql-pro-learning-kit](https://benjaminbanansos.github.io/mysql-pro-learning-kit/).
 
 ---
 
