@@ -29,6 +29,32 @@ docker exec -i mysql-pro-lab mysql -u root -proot_password_123 --local-infile=1 
 docker exec -i mysql-pro-lab mysql -u root -proot_password_123 --local-infile=1 < 02-schemas/04_load_data_scripts.sql
 ```
 
+### 4. Launch the Interactive Web Learning Platform
+Start the in-browser Web Platform featuring an embedded SQL engine (WASM), 24-week tracker, and 50 interview flashcards:
+```bash
+bash run_web_platform.sh
+# Opens automatically at http://localhost:3333
+```
+
+---
+
+## 🌐 Deploy to GitHub & GitHub Pages
+
+This repository includes a pre-configured GitHub Actions workflow (`.github/workflows/deploy-pages.yml`) that automatically builds and publishes the **Interactive Web Learning Platform** to **GitHub Pages** on every push!
+
+### How to Connect to Your GitHub Account:
+1. Create a new repository on [GitHub](https://github.com/new) (e.g., `mysql-pro-kit`).
+2. Run the following commands in your terminal:
+```bash
+git remote add origin https://github.com/<YOUR-USERNAME>/<YOUR-REPO-NAME>.git
+git push -u origin main
+```
+3. Enable GitHub Pages:
+   - On GitHub, go to **Settings** -> **Pages**.
+   - Under **Build and deployment**, select **Source: GitHub Actions**.
+4. Your live Web Learning Platform will immediately be live at:
+   `https://<YOUR-USERNAME>.github.io/<YOUR-REPO-NAME>/`
+
 ---
 
 ## 📅 The 6-Month Structured Curriculum
