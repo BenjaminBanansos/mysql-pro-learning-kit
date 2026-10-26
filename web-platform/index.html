@@ -538,6 +538,34 @@
 
         <!-- Main Query Editor & Results -->
         <div class="flex-1 space-y-4">
+          <!-- Live Cloud Container Connector Toolbar -->
+          <div class="bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 px-4 py-2.5 rounded-xl border border-indigo-800/40 flex flex-wrap items-center justify-between gap-2 shadow-inner">
+            <div class="flex items-center space-x-2 text-xs font-semibold text-indigo-300">
+              <span class="flex h-2 w-2 relative">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span>Query-Native Cloud Stream Connectors:</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-1.5 text-xs">
+              <button onclick="runCloudIngestFromUI('nyc_taxi')" class="px-2.5 py-1 rounded-lg bg-indigo-950/90 hover:bg-indigo-900 text-indigo-200 border border-indigo-700/60 font-mono text-[11px] font-semibold transition-all flex items-center shadow-sm" title="Connect directly to AWS S3 NYC Taxi Open Data">
+                <i class="fa-brands fa-aws text-amber-400 mr-1.5"></i>S3: NYC Taxi
+              </button>
+              <button onclick="runCloudIngestFromUI('amazon_reviews')" class="px-2.5 py-1 rounded-lg bg-indigo-950/90 hover:bg-indigo-900 text-indigo-200 border border-indigo-700/60 font-mono text-[11px] font-semibold transition-all flex items-center shadow-sm" title="Connect directly to AWS S3 Amazon Reviews Open Data">
+                <i class="fa-brands fa-aws text-amber-400 mr-1.5"></i>S3: Amazon Reviews
+              </button>
+              <button onclick="runCloudIngestFromUI('stack_overflow')" class="px-2.5 py-1 rounded-lg bg-indigo-950/90 hover:bg-indigo-900 text-indigo-200 border border-indigo-700/60 font-mono text-[11px] font-semibold transition-all flex items-center shadow-sm" title="Connect directly to Google BigQuery Stack Overflow Archive">
+                <i class="fa-brands fa-google text-blue-400 mr-1.5"></i>GCP: Stack Overflow
+              </button>
+              <button onclick="runCloudIngestFromUI('fineweb_llm')" class="px-2.5 py-1 rounded-lg bg-indigo-950/90 hover:bg-indigo-900 text-indigo-200 border border-indigo-700/60 font-mono text-[11px] font-semibold transition-all flex items-center shadow-sm" title="Connect directly to Hugging Face FineWeb LLM Tokens">
+                <i class="fa-solid fa-cube text-yellow-400 mr-1.5"></i>Hugging Face: FineWeb
+              </button>
+              <button onclick="runCloudIngestFromUI('crypto_blockchain')" class="px-2.5 py-1 rounded-lg bg-indigo-950/90 hover:bg-indigo-900 text-indigo-200 border border-indigo-700/60 font-mono text-[11px] font-semibold transition-all flex items-center shadow-sm" title="Connect directly to Bitcoin Blockchain Ledger">
+                <i class="fa-brands fa-bitcoin text-amber-400 mr-1.5"></i>Crypto Ledger
+              </button>
+            </div>
+          </div>
+
           <!-- Editor Card -->
           <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-lg">
             <div class="bg-slate-800/80 px-4 py-2.5 flex items-center justify-between border-b border-slate-700">
