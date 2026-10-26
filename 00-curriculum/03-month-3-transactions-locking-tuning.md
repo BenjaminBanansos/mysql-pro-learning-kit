@@ -1,48 +1,44 @@
-# Month 3: Concurrency, MVCC & Transaction Tuning (Weeks 9 - 12)
+# Month 3: Concurrency, MVCC & ACID on Blockchain Ledgers (Weeks 9 - 12)
 
 ## Objective
-Attain Staff Database Engineer proficiency in multi-threaded concurrency, row-level locking, deadlock diagnostics, and production server performance tuning under high-frequency transaction loads.
+Master ACID transaction isolation guarantees, row-level locking internals, deadlock prevention, and production server tuning using the immutable cryptographic ledger dataset from the **Bitcoin & Ethereum Public Blockchain** (`bigquery-public-data.crypto_bitcoin`).
 
 ---
 
-### Week 9: ACID, WAL & Crash Recovery
-- **ACID Deep Dive**:
-  - Atomicity: Undo log rollback mechanics.
-  - Consistency: Check constraints, foreign keys, application state transitions.
-  - Isolation: Mitigating dirty reads, non-repeatable reads, and phantom reads.
-  - Durability: Write-Ahead Logging (WAL) and `fsync()` guarantees.
-- **Tuning Durability vs Throughput**:
-  - `innodb_flush_log_at_trx_commit = 1` (Strict ACID) vs `2` (OS cache flush) vs `0` (Buffered in memory).
-  - Benchmarking transactions per second (TPS) under varying commit levels.
+### Week 9: ACID, WAL & Crash Recovery Tuning on Blockchain Transactions
+- **Atomicity & Durability**:
+  - Write-Ahead Logging (WAL): Redo log buffer -> Redo log files on disk -> Tablespaces.
+  - Undo logs: Rollback segments and MVCC version histories in system/undo tablespaces.
+- **Production Durability Tuning**:
+  - `innodb_flush_log_at_trx_commit = 1` (Strict ACID) vs `= 2` (OS Cache) vs `= 0` (1-sec flush).
+  - Double-write buffer synchronization with `sync_binlog = 1` for zero data loss.
+- **Crash Recovery Mechanics**: Redo phase (rolling forward committed transactions) vs Undo phase (rolling back active uncommitted transactions).
 
-### Week 10: Isolation Levels & MVCC Mechanics
-- **The Four Isolation Levels**:
-  - `READ UNCOMMITTED`: Dirty reads.
-  - `READ COMMITTED`: Consistent reads per statement; gap locks disabled for normal queries.
-  - `REPEATABLE READ` (MySQL Default): Consistent read view per transaction; phantom read prevention via Next-Key locks.
-  - `SERIALIZABLE`: Implicit shared read locks on all queries.
-- **MVCC Internal Tracking**:
-  - System fields `DB_TRX_ID` and `DB_ROLL_PTR`.
-  - Read View creation: `m_ids`, `min_trx_id`, `max_trx_id`, `creator_trx_id`.
+### Week 10: Isolation Levels & MVCC Snapshot Mechanics
+- **Isolation Levels Explained**:
+  - `READ UNCOMMITTED` (Dirty Reads)
+  - `READ COMMITTED` (Non-repeatable reads, read view refreshed every statement)
+  - `REPEATABLE READ` (Default MySQL isolation, read view created at first read)
+  - `SERIALIZABLE` (Implicit shared locks on all `SELECT` queries)
+- **MVCC Internal Mechanics on Crypto Transactions**:
+  - Clustered index hidden system columns: `DB_TRX_ID` (6 bytes), `DB_ROLL_PTR` (7 bytes), and `DB_ROW_ID`.
+  - How concurrent blockchain block arrivals read consistent balances without acquiring shared locks.
 
-### Week 11: Locking Internals & Deadlock Mastery
-- **InnoDB Lock Types**:
-  - Shared (S) vs Exclusive (X) locks.
-  - Intention Locks (IS / IX) on tables.
-  - Record Locks, Gap Locks, Next-Key Locks.
-- **Deadlock Diagnostics**:
-  - Deciphering `SHOW ENGINE INNODB STATUS`.
-  - Interpreting the "LATEST DETECTED DEADLOCK" graph.
-  - The Canonical Solution: Deterministic Lock Ordering (`LEAST`/`GREATEST`).
-- **Hands-On Lab**:
-  - Run `03-labs-and-exercises/lab04_deadlock_and_concurrency.py`.
+### Week 11: Locking Internals & Mathematical Deadlock Immunity
+- **Row-Level Lock Types**:
+  - Record Locks (Locks index record itself).
+  - Gap Locks (Locks the space between index records to eliminate Phantom Reads).
+  - Next-Key Locks (Record Lock + Gap Lock).
+  - Intention Locks (`IS`, `IX`) on table level.
+- **Deadlock Mastery on Blockchain UTXO Transfers**:
+  - Reproducing deadlocks under 50 concurrent worker threads transferring crypto balances between accounts.
+  - Inspecting `SHOW ENGINE INNODB STATUS` deadlock graph reports.
+  - **The Canonical Lock Ordering Solution**: Enforcing `LEAST(from_addr, to_addr)` ordering to mathematically guarantee 100% deadlock immunity.
 
-### Week 12: Production Server Tuning & Observability
-- **Core Parameters**:
-  - `innodb_buffer_pool_size` (Rule of thumb: 70-80% of dedicated RAM).
-  - `innodb_log_file_size` and `innodb_log_buffer_size`.
-  - `max_connections`, `thread_cache_size`, `table_open_cache`.
-- **Query Profiling & Slow Query Log**:
-  - Profiling queries with `SHOW PROFILE` and `PERFORMANCE_SCHEMA`.
-  - Configuring Slow Query Log (`long_query_time = 0.05`).
-  - Summarizing logs with `mysqldumpslow` and `pt-query-digest`.
+### Week 12: Production Server Tuning & Slow Query Logs
+- **Core my.cnf Optimization for 50,000+ TPS**:
+  - Memory: `innodb_buffer_pool_size`, `innodb_buffer_pool_instances`, `join_buffer_size`, `sort_buffer_size`.
+  - Concurrency: `innodb_thread_concurrency`, `max_connections`, `innodb_read_io_threads`.
+- **Query Profiling & Diagnosis**:
+  - Profiling queries with `long_query_time = 0.05` and `log_queries_not_using_indexes`.
+  - Digesting slow logs using `pt-query-digest` to identify performance bottlenecks.

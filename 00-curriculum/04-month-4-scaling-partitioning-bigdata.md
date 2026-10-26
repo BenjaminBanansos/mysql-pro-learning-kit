@@ -1,40 +1,39 @@
-# Month 4: Big Data Scaling, Partitioning & AWS Open Data (Weeks 13 - 16)
+# Month 4: Big Data Scaling, Partitioning & Petabytes (Weeks 13 - 16)
 
 ## Objective
-Scale MySQL to handle tens of millions of records using advanced table partitioning, high-speed ingestion pipelines, and real-world public cloud datasets directly from the **AWS Open Data Registry** (`s3://nyc-tlc/` and OurAirports).
+Ingest, partition, and query tens to hundreds of millions of records without performance degradation using public datasets from the **AWS Open Data Registry** (NYC TLC Taxi `s3://nyc-tlc/` & Common Crawl `s3://commoncrawl/`).
 
 ---
 
-### Week 13: High-Speed Ingestion & Bulk Data Pipelines
-- **Overcoming Bulk Load Bottlenecks**:
-  - Why individual `INSERT` statements are 1,000x slower (Network roundtrips, transaction commits, index page updates).
-  - Maximizing bulk throughput: `LOAD DATA LOCAL INFILE`, multi-row batching, disabling foreign key & unique checks during load.
-  - Streaming data directly from AWS Open Data public buckets into MySQL in seconds.
-
-### Week 14: AWS Open Data Ingestion & Spatial GIS SQL
-- **AWS Open Data Registry Datasets**:
-  - AWS Public S3: `s3://nyc-tlc/trip data/` (NYC Yellow Taxi, millions of trips).
-  - OurAirports Global Aviation database (75,000+ worldwide nodes).
-- **MySQL 8 Spatial GIS Data**:
-  - `POINT`, `LINESTRING`, `POLYGON` geometry types.
-  - Spatial indexes using R-Trees (`SPATIAL INDEX`).
-  - Spatial functions: `ST_Distance_Sphere()`, `ST_Contains()`, `ST_GeomFromText()`.
+### Week 13: High-Speed Bulk Ingestion & Cloud Streaming
+- **`LOAD DATA LOCAL INFILE` Architecture**:
+  - Bypassing SQL query parser layer for raw C-level bulk streaming.
+  - Sizing `bulk_insert_buffer_size` and disabling `unique_checks = 0` / `foreign_key_checks = 0` during massive batch loads.
 - **Hands-On Lab**:
-  - Calculate great-circle flight distances between world hubs using spatial SQL on downloaded AWS airport data.
+  - Ingesting millions of records from AWS Open Data in under 60 seconds.
+  - Multi-threaded chunk loading using parallel bash/Python workers.
 
-### Week 15: Table Partitioning Architectures on AWS Scale
-- **Partitioning Strategies**:
-  - `RANGE` & `RANGE COLUMNS`: Temporal time-series partitioning on NYC Taxi data (`PARTITION BY RANGE COLUMNS(pickup_datetime)`).
-  - `LIST` & `LIST COLUMNS`: Categorical / Regional partitioning.
-  - `HASH` & `KEY`: Distributing writes evenly across N physical tablespace partitions.
-- **The Core Constraint**:
-  - Architectural rule: Every unique key and primary key MUST contain all partition expression columns (`(trip_id, pickup_datetime)`).
+### Week 14: Spatial GIS Analytics on Urban Transit & Global Networks
+- **MySQL 8 Spatial GIS Functions**:
+  - Point, Linestring, and Polygon geometries with Spatial Reference System ID (SRID 4326 for WGS 84 GPS).
+  - Spatial indexes using R-Trees (Bounding Box MBR filtering).
+- **Hands-On Exercises**:
+  - Calculating exact transit distance between NYC pickup and dropoff points via `ST_Distance_Sphere()`.
+  - Finding the 10 nearest transit hubs to any coordinate in sub-15ms.
 
-### Week 16: Partition Pruning & Zero-Downtime Data Lifecycle
-- **Verifying Partition Pruning**:
-  - Inspecting execution plans with `EXPLAIN` to verify partition elimination: scanning only target quarterly partitions while skipping millions of historical rows.
-- **Zero-Downtime Data Aging on AWS Datasets**:
-  - Deleting millions of historical rows with `ALTER TABLE ... DROP PARTITION` in < 10ms without generating undo/redo bloat.
-  - Splitting future ranges with `REORGANIZE PARTITION`.
+### Week 15: Table Partitioning Architecture on Billions of NYC Taxi Trips
+- **Partitioning Strategy**:
+  - `RANGE (TO_DAYS(pickup_datetime))` vs `RANGE COLUMNS` vs `HASH` partitioning.
+  - Subpartitioning (Composite Range + Hash) for multi-terabyte tables.
+- **The Golden Architectural Rule**:
+  - Why every unique and primary key on a partitioned table must include the partition key (`trip_id, pickup_datetime`).
 - **Hands-On Lab**:
-  - Run `03-labs-and-exercises/lab05_partition_pruning_benchmark.sql`.
+  - Creating a quarterly partitioned table across 50,000,000+ NYC Taxi records.
+
+### Week 16: Partition Pruning & Zero-Downtime Data Lifecycle Aging
+- **Partition Pruning Diagnostics**:
+  - Verifying optimizer partition elimination using `EXPLAIN SELECT ...`.
+  - Comparing full table scans (reading 100% of `.ibd` files) against pruned scans (reading only 1 partition, reducing I/O by 80–90%).
+- **Zero-Downtime Data Aging on Common Crawl & Taxi Data**:
+  - Instant data retirement via `ALTER TABLE nyc_yellow_taxi_trips DROP PARTITION p2020_q1`.
+  - Proving sub-15ms drop performance compared to hours-long locking `DELETE FROM ...` operations with zero redo/undo log bloat.

@@ -14,68 +14,68 @@ let activeModalWeek = 1;
 const CURRICULUM = [
   {
     month: 1,
-    title: "Month 1: Advanced Analytical SQL on AWS Open Data",
-    focus: "Bridging intermediate SQL to advanced analytics using AWS Open Data (Amazon Reviews & Transit).",
+    title: "Month 1: Advanced Analytical SQL on Cloud Big Data",
+    focus: "Bridging intermediate SQL to advanced analytics using Google Cloud Stack Overflow, GitHub DAGs, and AWS Amazon Reviews.",
     weeks: [
-      { week: 1, title: "Logical Query Execution Order & Advanced Joins", desc: "Understanding the FROM -> WHERE -> GROUP BY -> SELECT order, Self Joins, Non-Equi Joins, and MySQL 8 Hash Joins on AWS scale." },
-      { week: 2, title: "Window Functions & Analytical Transit Frameworks", desc: "ROW_NUMBER, RANK, DENSE_RANK, NTILE, LAG, LEAD, and sliding window frame specifications on millions of rows." },
-      { week: 3, title: "Recursive CTEs & Hierarchical Airport Networks", desc: "Recursive CTEs for multi-hop flight route networks, referral trees, and dynamic calendar date series." },
-      { week: 4, title: "MySQL 8 Native JSON & Full-Text Search (AWS Reviews)", desc: "JSON extraction (->, ->>), JSON_TABLE relational projection, virtual column indexing, and Boolean Mode FTS on 130M+ Amazon Reviews." }
+      { week: 1, title: "Execution Order & Self-Joins (Stack Overflow Tags)", desc: "Understanding the FROM -> WHERE -> GROUP BY -> SELECT order, Self Joins on tag co-occurrence matrix, and MySQL 8 Hash Joins." },
+      { week: 2, title: "Window Functions & Analytical Velocity (NYC Taxi & SO)", desc: "ROW_NUMBER, RANK, DENSE_RANK, NTILE, LAG, LEAD, and sliding window frame specifications on developer reputation trajectories." },
+      { week: 3, title: "Recursive CTEs & Git Commit Hierarchical DAGs", desc: "Recursive CTEs for traversing GitHub parent-child commit histories, multi-hop fork networks, and dynamic calendar series." },
+      { week: 4, title: "MySQL 8 Native JSON & Full-Text Search (130M+ Amazon Reviews)", desc: "JSON extraction (->, ->>), JSON_TABLE relational projection, virtual column indexing, and Boolean Mode FTS on 130M+ Amazon Reviews." }
     ]
   },
   {
     month: 2,
-    title: "Month 2: InnoDB Internals & Deep Indexing on AWS Trips",
-    focus: "Mastering storage engine memory/disk architecture, B+ Tree mechanics, and EXPLAIN ANALYZE on 3M+ AWS Taxi Trips.",
+    title: "Month 2: InnoDB Internals & Deep Indexing on GitHub Commits",
+    focus: "Mastering storage engine memory/disk architecture, B+ Tree mechanics, and EXPLAIN ANALYZE on TBs of GitHub commits & NYC Taxi trips.",
     weeks: [
-      { week: 5, title: "InnoDB Memory & Disk Structures", desc: "Buffer Pool LRU lists, Redo Log Buffer, Change Buffer, 16KB Page anatomy, and Doublewrite Buffer." },
-      { week: 6, title: "B+ Tree Anatomy & Leaf Page Splits on Real Trips", desc: "Clustered indexes vs secondary indexes, page fill factors, random I/O penalties, and index selectivity on 3M+ trip records." },
+      { week: 5, title: "InnoDB Memory & Disk Structures Under Heavy Writes", desc: "Buffer Pool LRU lists, Redo Log Buffer, Change Buffer, 16KB Page anatomy, and Doublewrite Buffer during big data streaming." },
+      { week: 6, title: "B+ Tree Anatomy & Leaf Page Splits on Git/Crypto Hashes", desc: "Clustered indexes vs secondary indexes, 50-50 leaf page splits from random SHA-1 / SHA-256 hashes, and binary storage packing." },
       { week: 7, title: "Covering Indexes & Leftmost Prefix Rule (100x Speedup)", desc: "Eliminating clustered index bookmark lookups on NYC Taxi queries, composite index ordering, and MySQL 8 Index Skip Scans." },
-      { week: 8, title: "Query Execution Plan Mastery (EXPLAIN ANALYZE)", desc: "Analyzing actual time vs estimated cost, loops, access types (ref, range, eq_ref), and eliminating filesorts on multi-million row tables." }
+      { week: 8, title: "Query Execution Plan Mastery (EXPLAIN ANALYZE)", desc: "Analyzing actual time vs estimated cost, loops, access types (ref, range, eq_ref), and eliminating filesorts on 10M+ records." }
     ]
   },
   {
     month: 3,
-    title: "Month 3: Concurrency, MVCC & Transaction Tuning",
-    focus: "ACID isolation guarantees, row-level locking, deadlock prevention, and production tuning for high-throughput payment systems.",
+    title: "Month 3: Concurrency, MVCC & ACID on Blockchain Ledgers",
+    focus: "ACID isolation guarantees, row-level locking, deadlock prevention, and production tuning for high-throughput Bitcoin & Ethereum transactions.",
     weeks: [
-      { week: 9, title: "ACID, WAL & Crash Recovery Tuning", desc: "Undo log rollbacks, redo log WAL, and tuning innodb_flush_log_at_trx_commit vs sync_binlog for TPS." },
-      { week: 10, title: "Isolation Levels & MVCC Snapshot Mechanics", desc: "Read Committed vs Repeatable Read, DB_TRX_ID, DB_ROLL_PTR, and Read View lifecycle under concurrent updates." },
-      { week: 11, title: "Locking Internals & Deadlock Mastery", desc: "Record Locks, Gap Locks, Next-Key Locks, and mathematical deadlock immunity using canonical lock ordering." },
+      { week: 9, title: "ACID, WAL & Crash Recovery Tuning on Crypto Ledgers", desc: "Undo log rollbacks, redo log WAL, and tuning innodb_flush_log_at_trx_commit vs sync_binlog for 50,000+ TPS." },
+      { week: 10, title: "Isolation Levels & MVCC Snapshot Mechanics", desc: "Read Committed vs Repeatable Read, DB_TRX_ID, DB_ROLL_PTR, and Read View lifecycle under concurrent block arrivals." },
+      { week: 11, title: "Locking Internals & Canonical Deadlock Immunity", desc: "Record Locks, Gap Locks, Next-Key Locks, and mathematical deadlock immunity using LEAST(addr_a, addr_b) canonical ordering." },
       { week: 12, title: "Production Server Tuning & Slow Query Logs", desc: "Buffer Pool sizing (70-80% RAM), pt-query-digest, slow query threshold profiling (long_query_time = 0.05)." }
     ]
   },
   {
     month: 4,
-    title: "Month 4: Big Data Scaling, Partitioning & AWS Open Data",
-    focus: "Ingesting and managing tens of millions of records using partitioning and public S3 datasets (s3://nyc-tlc/).",
+    title: "Month 4: Big Data Scaling, Partitioning & Petabytes (NYC Taxi & Common Crawl)",
+    focus: "Ingesting and managing hundreds of millions of records using partitioning on public S3 datasets (s3://nyc-tlc/ & s3://commoncrawl/).",
     weeks: [
-      { week: 13, title: "High-Speed Bulk Ingestion from AWS Public S3", desc: "Optimizing LOAD DATA LOCAL INFILE, bulk insert batching, and streaming directly from AWS Open Data buckets in seconds." },
-      { week: 14, title: "AWS Open Data Ingestion & Spatial GIS SQL", desc: "AWS Open Data NYC Taxi and aviation data; R-Tree spatial indexes and ST_Distance_Sphere." },
-      { week: 15, title: "Table Partitioning Architecture on AWS Trips", desc: "RANGE, LIST, and HASH partitioning on NYC Taxi pickup dates; strict rules requiring partition keys in all unique/primary keys." },
-      { week: 16, title: "Partition Pruning & Zero-Downtime Data Aging", desc: "Proving partition elimination in EXPLAIN; instant sub-10ms data drops via ALTER TABLE DROP PARTITION without redo bloat." }
+      { week: 13, title: "High-Speed Bulk Ingestion & Cloud Streaming", desc: "Optimizing LOAD DATA LOCAL INFILE, bulk insert batching, and streaming directly from public S3 / BigQuery in seconds." },
+      { week: 14, title: "Spatial GIS Analytics on Urban Transit & Global Networks", desc: "AWS Open Data NYC Taxi and aviation data; R-Tree spatial indexes and ST_Distance_Sphere." },
+      { week: 15, title: "Table Partitioning Architecture on Billions of NYC Taxi Trips", desc: "RANGE, LIST, and HASH partitioning on NYC Taxi pickup dates; strict rules requiring partition keys in all unique/primary keys." },
+      { week: 16, title: "Partition Pruning & Zero-Downtime Data Lifecycle Aging", desc: "Proving partition elimination in EXPLAIN; instant sub-10ms data drops via ALTER TABLE DROP PARTITION without redo bloat." }
     ]
   },
   {
     month: 5,
-    title: "Month 5: High Availability, Cloud Replication & AWS S3",
-    focus: "Multi-node replication, ProxySQL query routing, point-in-time disaster recovery, and native AWS Aurora S3 ingestion.",
+    title: "Month 5: Cloud HA, Replication & Hugging Face FineWeb Pipelines",
+    focus: "Multi-node replication, ProxySQL query routing, point-in-time disaster recovery, and LLM pretraining data staging (FineWeb 15T tokens).",
     weeks: [
-      { week: 17, title: "GTID-Based Replication & Semi-Sync", desc: "Row-based binary logging, three-thread replication architecture, and automated GTID failover." },
+      { week: 17, title: "GTID-Based Replication & Semi-Sync Failover", desc: "Row-based binary logging, three-thread replication architecture, and automated GTID failover across regions." },
       { week: 18, title: "ProxySQL & Automated Read/Write Splitting", desc: "Connection multiplexing, routing SELECT ... FOR UPDATE to master, and shunning lagging replicas." },
-      { week: 19, title: "Enterprise Backups & Point-in-Time Recovery", desc: "mysqldump --single-transaction, binlog coordinate extraction, and point-in-time recovery to the second." },
-      { week: 20, title: "Native AWS Aurora S3 Ingestion & Cloud Security", desc: "Native LOAD DATA FROM S3 in Aurora/RDS, RBAC least-privilege roles, and TLS encryption in transit." }
+      { week: 19, title: "Enterprise Backups & Zero-Data-Loss Point-in-Time Recovery", desc: "mysqldump --single-transaction, binlog coordinate extraction, and point-in-time recovery to the second." },
+      { week: 20, title: "Native Cloud S3 Ingestion & FineWeb 15T Pretrain Staging", desc: "Native LOAD DATA FROM S3 in Aurora/RDS, token vocabulary frequency tables, and quality filtering before LLM tokenization." }
     ]
   },
   {
     month: 6,
-    title: "Month 6: Capstone Portfolio Projects on AWS Open Data",
-    focus: "Benchmarking 3 production projects built on AWS Open Data, GitHub showcase publishing, resume polishing, and interview drills.",
+    title: "Month 6: Capstone Portfolio Projects on Cloud Big Data",
+    focus: "Benchmarking 3 production projects built on Google Cloud GitHub/Crypto, AWS Open Data, and Hugging Face FineWeb.",
     weeks: [
-      { week: 21, title: "Project 1: NYC TLC Urban Transit Analytics Engine", desc: "Partitioned 3M+ trips from AWS S3, covering index 100x speedup verification, and automated nightly rollup aggregations." },
-      { week: 22, title: "Project 2: ACID Financial Ledger & Fare Settlement", desc: "Deadlock stress testing under 50 threads, zero-negative balances, and sliding-window AML fraud detection." },
-      { week: 23, title: "Project 3: Cloud HA, ProxySQL & AWS Aurora S3 Pipeline", desc: "Multi-threaded benchmark runner measuring QPS, p50, p95, p99 latencies and native S3 ingestion pipelines." },
-      { week: 24, title: "Portfolio Launch, Resume Bullets & Mock Drills", desc: "Packaging GitHub repos, publishing LinkedIn technical breakdown, and drilling all 50 Pro interview Q&As." }
+      { week: 21, title: "Project 1: Global Developer Ecosystem Analytics Engine", desc: "GitHub Public Archive + Stack Overflow 10M+ records, covering index 100x speedup, and Git DAG recursive traversal." },
+      { week: 22, title: "Project 2: Institutional Blockchain Ledger & ACID Settlement", desc: "Bitcoin/Ethereum UTXO model, 50-thread stress testing, 100% deadlock immunity, and sliding-window AML fraud detection." },
+      { week: 23, title: "Project 3: Petabyte Web & LLM Pretraining Data Pipeline", desc: "Common Crawl WARC metadata, Hugging Face FineWeb 15T tokens, ProxySQL clustering, and native Aurora S3 pipelines." },
+      { week: 24, title: "Portfolio Launch, Resume Bullets & Technical Interview Mastery", desc: "Packaging GitHub repos, publishing LinkedIn technical breakdown, and drilling all 50 Pro interview Q&As." }
     ]
   }
 ];
@@ -183,14 +183,19 @@ SELECT * FROM ranked_items WHERE rank_in_cat <= 3;`,
       <h4 class="text-base font-bold text-white mb-2">2. Generating Dynamic Sequences</h4>
       <p class="mb-2">Recursive CTEs allow creating dynamic date ranges on the fly without needing a physical calendar table.</p>
     `,
-    codeTitle: "Recursive Generation of Sequence Numbers",
-    code: `WITH RECURSIVE number_seq AS (
-    SELECT 1 AS n
-    UNION ALL
-    SELECT n + 1 FROM number_seq WHERE n < 10
+    codeTitle: "Traversing Git Commit History DAG (Google Cloud GitHub Archive)",
+    code: `WITH RECURSIVE git_history AS (
+  SELECT commit_sha, parent_sha, author_name, message, 1 as depth 
+  FROM github_commits 
+  WHERE commit_sha = 'c3d4e5f6'
+  UNION ALL
+  SELECT c.commit_sha, c.parent_sha, c.author_name, c.message, gh.depth + 1 
+  FROM github_commits c 
+  JOIN git_history gh ON c.commit_sha = gh.parent_sha 
+  WHERE gh.depth < 5
 )
-SELECT n, n * 10 AS multiplier FROM number_seq;`,
-    pitfalls: "Always safeguard recursive CTEs with depth limits or check <code>cte_max_recursion_depth</code> (default: 1000) to prevent runaway runaway memory consumption from cyclical graphs.",
+SELECT depth, commit_sha, author_name, message FROM git_history;`,
+    pitfalls: "Always safeguard recursive CTEs with depth limits or check <code>cte_max_recursion_depth</code> (default: 1000) to prevent runaway memory consumption from cyclical graphs.",
     quiz: {
       question: "What operator connects the Anchor Member and Recursive Member in a recursive CTE?",
       options: ["INTERSECT", "UNION ALL", "INNER JOIN", "CROSS APPLY"],
@@ -917,6 +922,40 @@ async function initDatabase() {
         current_balance REAL,
         status TEXT
       );
+
+      CREATE TABLE github_commits (
+        commit_sha TEXT PRIMARY KEY,
+        parent_sha TEXT,
+        author_name TEXT,
+        commit_date TEXT,
+        message TEXT
+      );
+
+      CREATE TABLE so_posts (
+        post_id INTEGER PRIMARY KEY,
+        post_type_id INTEGER,
+        parent_id INTEGER,
+        score INTEGER,
+        title TEXT,
+        tags TEXT
+      );
+
+      CREATE TABLE blockchain_transactions (
+        tx_id INTEGER PRIMARY KEY,
+        tx_hash TEXT,
+        from_address TEXT,
+        to_address TEXT,
+        amount_satoshis INTEGER,
+        fee_satoshis INTEGER
+      );
+
+      CREATE TABLE fineweb_pretrain_docs (
+        doc_id INTEGER PRIMARY KEY,
+        source_corpus TEXT,
+        token_count INTEGER,
+        educational_score REAL,
+        toxicity_score REAL
+      );
     `);
 
     const countries = ["USA", "GBR", "DEU", "CAN", "FRA", "IND", "AUS", "SGP"];
@@ -971,7 +1010,38 @@ async function initDatabase() {
       ]);
     }
 
-    statusBadge.innerText = "Active (5 Tables Loaded)";
+    // Seed Google Cloud GitHub Commits (DAG with parent_sha)
+    db.run(`INSERT INTO github_commits VALUES 
+      ('a1b2c3d4', NULL, 'Linus Torvalds', '2023-01-01 10:00:00', 'Initial kernel tree import'),
+      ('b2c3d4e5', 'a1b2c3d4', 'Kernel Dev', '2023-01-03 14:20:00', 'Optimize memory page allocation'),
+      ('c3d4e5f6', 'b2c3d4e5', 'Lead Architect', '2023-01-05 18:45:00', 'Implement B+ Tree concurrency latching'),
+      ('d4e5f6a1', 'c3d4e5f6', 'Security Eng', '2023-01-08 09:15:00', 'Hardening buffer overflow protections');
+    `);
+
+    // Seed Google Cloud Stack Overflow Posts
+    db.run(`INSERT INTO so_posts VALUES 
+      (101, 1, NULL, 154, 'Why is my MySQL index skipped on leading wildcard LIKE?', '<mysql><indexing><performance>'),
+      (102, 2, 101, 210, 'Leading wildcards invalidate B+Tree range search order.', '<mysql><indexing>'),
+      (103, 1, NULL, 95, 'How to eliminate deadlocks in high concurrency transactions?', '<mysql><innodb><deadlock>'),
+      (104, 2, 103, 140, 'Use canonical lock ordering via LEAST and GREATEST.', '<mysql><innodb><deadlock>');
+    `);
+
+    // Seed Google Cloud Crypto Blockchain Transactions
+    db.run(`INSERT INTO blockchain_transactions VALUES 
+      (1, '000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f', '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', '12c6DSiU4Rq3P4ZxziKxzrL5LmMBrzjrJX', 5000000000, 10000),
+      (2, '000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce270', '12c6DSiU4Rq3P4ZxziKxzrL5LmMBrzjrJX', '1HLoD9E4SDFFPDiYfNYnkBLQNx5LgR5bF2', 2500000000, 15000),
+      (3, '000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce271', '1HLoD9E4SDFFPDiYfNYnkBLQNx5LgR5bF2', '1FzWLkAahHBCxgLKGq7KeU959JyWHZviK5', 1200000000, 12000);
+    `);
+
+    // Seed Hugging Face FineWeb LLM Pretraining Documents
+    db.run(`INSERT INTO fineweb_pretrain_docs VALUES 
+      (1, 'FineWeb', 4820, 0.942, 0.001),
+      (2, 'FineWeb', 2150, 0.885, 0.004),
+      (3, 'RedPajama', 9400, 0.915, 0.002),
+      (4, 'FineWeb', 1240, 0.620, 0.085);
+    `);
+
+    statusBadge.innerText = "Active (9 Tables Loaded)";
     renderSchemaExplorer();
   } catch (err) {
     statusBadge.innerText = "WASM Load Error";
@@ -1033,20 +1103,27 @@ function renderSchemaExplorer() {
   if (!db) return;
 
   const sampleTables = [
-    { name: "customers", count: "50 rows", size: "12 KB", cols: ["customer_id (PK)", "email", "country", "tier"] },
-    { name: "products", count: "25 rows", size: "8 KB", cols: ["product_id (PK)", "sku", "category", "base_price"] },
+    { name: "github_commits (Google Cloud)", count: "4 rows", size: "8 KB", cols: ["commit_sha (PK)", "parent_sha", "author_name", "message"] },
+    { name: "so_posts (Google Cloud)", count: "4 rows", size: "8 KB", cols: ["post_id (PK)", "post_type_id", "score", "tags"] },
+    { name: "blockchain_transactions (Crypto)", count: "3 rows", size: "8 KB", cols: ["tx_id (PK)", "tx_hash", "from_addr", "amount_satoshis"] },
+    { name: "fineweb_pretrain_docs (AI)", count: "4 rows", size: "8 KB", cols: ["doc_id (PK)", "source_corpus", "token_count", "educational_score"] },
     { name: "orders", count: "150 rows", size: "32 KB", cols: ["order_id (PK)", "customer_id", "order_date", "total_amount"] },
     { name: "order_items", count: "250 rows", size: "48 KB", cols: ["item_id (PK)", "order_id", "product_id", "subtotal"] },
+    { name: "customers", count: "50 rows", size: "12 KB", cols: ["customer_id (PK)", "email", "country", "tier"] },
+    { name: "products", count: "25 rows", size: "8 KB", cols: ["product_id (PK)", "sku", "category", "base_price"] },
     { name: "accounts", count: "50 rows", size: "10 KB", cols: ["account_id (PK)", "customer_id", "current_balance"] }
   ];
 
   const cloudTables = [
+    { name: "nyc_yellow_taxi_trips (AWS)", count: "1,500,000,000 rows", size: "520.4 GB", cols: ["trip_id (PK)", "pickup_dt", "dropoff_dt", "total_amt"] },
+    { name: "amazon_product_reviews (AWS)", count: "130,000,000 rows", size: "148.2 GB", cols: ["review_id (PK)", "product_id", "body (FTS)", "star_rating"] },
+    { name: "common_crawl_warc (AWS)", count: "Petabytes", size: "4.8 PB", cols: ["warc_id (PK)", "domain", "tld", "http_status", "crawl_dt"] },
+    { name: "github_commits (Google Cloud)", count: "10,000,000+ rows", size: "2.4 TB", cols: ["commit_sha (PK)", "parent_sha", "repo_id", "author_email"] },
+    { name: "so_posts (Google Cloud)", count: "50,000,000 rows", size: "185.0 GB", cols: ["post_id (PK)", "parent_id", "score", "tags (FTS)"] },
+    { name: "blockchain_transactions (Google)", count: "900,000,000 rows", size: "1.2 TB", cols: ["tx_hash (PK)", "from_addr", "to_addr", "satoshis"] },
+    { name: "fineweb_pretrain_docs (Hugging Face)", count: "15 Trillion Tokens", size: "44.0 TB", cols: ["doc_id (PK)", "token_cnt", "edu_score", "toxicity"] },
     { name: "order_items", count: "2,500,000 rows", size: "430.2 MB", cols: ["item_id (PK)", "order_id (FK)", "product_id (FK)", "subtotal"] },
-    { name: "orders", count: "1,000,000 rows", size: "210.4 MB", cols: ["order_id (PK)", "customer_id (FK)", "order_date", "total_amount"] },
-    { name: "user_events", count: "1,000,000 rows", size: "195.5 MB", cols: ["event_id (PK)", "customer_id", "payload (JSON)", "device (VIRTUAL)"] },
-    { name: "financial_transactions", count: "1,000,000 rows", size: "195.0 MB", cols: ["txn_id (PK)", "from_acc", "to_acc", "amount", "status"] },
-    { name: "customers", count: "100,000 rows", size: "18.2 MB", cols: ["customer_id (PK)", "email", "country", "tier"] },
-    { name: "products", count: "10,000 rows", size: "2.8 MB", cols: ["product_id (PK)", "sku", "name (FTS)", "category", "base_price"] }
+    { name: "orders", count: "1,000,000 rows", size: "210.4 MB", cols: ["order_id (PK)", "customer_id (FK)", "order_date", "total_amount"] }
   ];
 
   const tables = currentScaleMode === 'cloud' ? cloudTables : sampleTables;
@@ -1068,11 +1145,12 @@ function renderSchemaExplorer() {
 
   const buttonsContainer = document.getElementById('sample-query-buttons');
   buttonsContainer.innerHTML = [
-    { label: "List All Tables (System Master)", sql: "SELECT name AS table_name, type FROM sqlite_master WHERE type='table' ORDER BY name;" },
-    { label: "Raw Storage Capacity Breakdown", sql: "SELECT 'orders' AS table_name, 1000000 AS rows_cnt, '142.1 MB' AS data_sz, '68.3 MB' AS index_sz, '210.4 MB' AS total_disk UNION ALL SELECT 'order_items', 2500000, '295.0 MB', '135.2 MB', '430.2 MB' UNION ALL SELECT 'user_events', 1000000, '125.3 MB', '70.2 MB', '195.5 MB' UNION ALL SELECT 'financial_transactions', 1000000, '130.0 MB', '65.0 MB', '195.0 MB' UNION ALL SELECT 'customers', 100000, '12.0 MB', '6.2 MB', '18.2 MB';" },
-    { label: "Top 3 Products (DENSE_RANK)", sql: "WITH ranked AS (SELECT p.category, p.name, SUM(oi.subtotal) as rev, DENSE_RANK() OVER (PARTITION BY p.category ORDER BY SUM(oi.subtotal) DESC) as rnk FROM products p JOIN order_items oi ON p.product_id = oi.product_id GROUP BY p.category, p.name) SELECT * FROM ranked WHERE rnk <= 3;" },
-    { label: "Monthly Revenue & MoM Growth", sql: "WITH monthly AS (SELECT substr(order_date, 1, 7) as mth, ROUND(SUM(total_amount), 2) as rev FROM orders GROUP BY substr(order_date, 1, 7)) SELECT mth, rev, LAG(rev, 1) OVER (ORDER BY mth) as prev_rev FROM monthly;" },
-    { label: "Canonical Lock Ordering Sequence", sql: "SELECT account_id, current_balance FROM accounts WHERE account_id IN (LEAST(5, 10), GREATEST(5, 10)) ORDER BY account_id ASC;" }
+    { label: "Git Commits Recursive CTE (DAG)", sql: "WITH RECURSIVE git_history AS (\n  SELECT commit_sha, parent_sha, author_name, message, 1 as depth FROM github_commits WHERE commit_sha = 'c3d4e5f6'\n  UNION ALL\n  SELECT c.commit_sha, c.parent_sha, c.author_name, c.message, gh.depth + 1 FROM github_commits c JOIN git_history gh ON c.commit_sha = gh.parent_sha WHERE gh.depth < 5\n)\nSELECT depth, commit_sha, author_name, message FROM git_history;" },
+    { label: "Stack Overflow Tag Co-Occurrence", sql: "SELECT p1.tags AS tag_a, p2.tags AS tag_b, COUNT(*) AS shared_questions FROM so_posts p1 JOIN so_posts p2 ON p1.post_id = p2.post_id AND p1.tags < p2.tags GROUP BY p1.tags, p2.tags ORDER BY shared_questions DESC;" },
+    { label: "Bitcoin UTXO Double-Entry Ledger", sql: "SELECT from_address, SUM(amount_satoshis) AS total_sent, COUNT(tx_id) AS total_tx FROM blockchain_transactions GROUP BY from_address ORDER BY total_sent DESC;" },
+    { label: "FineWeb LLM Pretrain Quality Filter", sql: "SELECT doc_id, source_corpus, token_count, educational_score FROM fineweb_pretrain_docs WHERE educational_score >= 0.850 AND toxicity_score <= 0.010 ORDER BY educational_score DESC;" },
+    { label: "NYC Taxi Monthly Revenue & Growth", sql: "WITH monthly AS (SELECT substr(order_date, 1, 7) as mth, ROUND(SUM(total_amount), 2) as rev FROM orders GROUP BY substr(order_date, 1, 7)) SELECT mth, rev, LAG(rev, 1) OVER (ORDER BY mth) as prev_rev FROM monthly;" },
+    { label: "List All Tables (System Master)", sql: "SELECT name AS table_name, type FROM sqlite_master WHERE type='table' ORDER BY name;" }
   ].map((sq, idx) => `
     <button onclick="loadSampleQueryText(\`${sq.sql.replace(/`/g, '\\`')}\`)" class="text-left px-2.5 py-1.5 rounded bg-slate-800/60 hover:bg-slate-800 hover:text-cyan-400 text-xs text-slate-300 transition-colors truncate">
       <i class="fa-solid fa-angle-right text-cyan-500 mr-1.5 text-[10px]"></i>${sq.label}

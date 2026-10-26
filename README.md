@@ -1,6 +1,9 @@
-# 🚀 MySQL Intermediate to Pro Learning Kit (AWS Open Data Scale: 5M+ Records)
+# 🚀 MySQL Intermediate to Pro Learning Kit (Cloud Big Data: AWS • Google Cloud • Hugging Face)
 
-A complete, production-grade learning suite and portfolio accelerator designed to take developers, data analysts, and software engineers from **intermediate SQL** to **Pro / Senior Database Architect & Staff Data Engineer** over a structured **6-month curriculum**, powered directly by real-world datasets from the **[AWS Open Data Registry](https://registry.opendata.aws/)** (`s3://nyc-tlc/`, `s3://amazon-reviews-pds/`, OurAirports).
+A complete, production-grade learning suite and portfolio accelerator designed to take developers, data analysts, and software engineers from **intermediate SQL** to **Pro / Senior Database Architect & Staff Data Engineer** over a structured **6-month curriculum**, powered by **8 Tier-1 Cloud Big Data Sources**:
+- **AWS Open Data Registry (S3 Public)**: NYC TLC Taxi (1.5B+ trips), Amazon Customer Reviews (130M+ rows), Common Crawl (Petabytes).
+- **Google Cloud Public Datasets (BigQuery)**: GitHub Public Archive (TBs of commits & file trees), Stack Overflow (50M+ QA pairs), Bitcoin & Ethereum Blockchain Ledger (1.5 TB+).
+- **Hugging Face Hub (AI Corpora)**: FineWeb (15 Trillion Tokens, 44+ TB) & RedPajama used for LLM pretraining data engineering in MySQL.
 
 ---
 
@@ -13,14 +16,20 @@ docker compose up -d
 - **MySQL 8.0 Engine**: `localhost:3306` (User: `root`, Password: `root_password_123`)
 - **Adminer Web GUI**: `http://localhost:8080` (System: `MySQL`, Server: `mysql-pro`, User: `root`, Pass: `root_password_123`)
 
-### 2. Connect to AWS Open Data Registry or Generate Data
-Connect directly to public AWS S3 buckets (no AWS account required):
+### 2. Connect to Cloud Big Data Sources (AWS, Google Cloud, Hugging Face)
+Connect directly to public cloud datasets (no account or API key required):
 ```bash
-# Stream real public datasets from AWS Open Data Registry:
-python3 01-datasets/aws_open_data_connector.py --fetch aviation_airports
-python3 01-datasets/aws_open_data_connector.py --fetch nyc_taxi
+# View all 8 cloud datasets in the master catalog:
+python3 01-datasets/cloud_public_datasets_connector.py --list
 
-# Or generate 4.6 Million rows instantly in ~15 seconds:
+# Download sample chunks from AWS, Google Cloud, or Hugging Face:
+python3 01-datasets/cloud_public_datasets_connector.py --fetch nyc_taxi
+python3 01-datasets/cloud_public_datasets_connector.py --fetch github_repos
+python3 01-datasets/cloud_public_datasets_connector.py --fetch stack_overflow
+python3 01-datasets/cloud_public_datasets_connector.py --fetch crypto_blockchain
+python3 01-datasets/cloud_public_datasets_connector.py --fetch fineweb_llm
+
+# Or generate 4.6 Million rows locally in ~15 seconds:
 python3 01-datasets/generate_synthetic_millions.py --scale standard
 ```
 
@@ -31,6 +40,7 @@ docker exec -i mysql-pro-lab mysql -u root -proot_password_123 --local-infile=1 
 docker exec -i mysql-pro-lab mysql -u root -proot_password_123 --local-infile=1 < 02-schemas/02_financial_ledger_schema.sql
 docker exec -i mysql-pro-lab mysql -u root -proot_password_123 --local-infile=1 < 02-schemas/03_partitioned_analytics_schema.sql
 docker exec -i mysql-pro-lab mysql -u root -proot_password_123 --local-infile=1 < 02-schemas/05_aws_open_data_schema.sql
+docker exec -i mysql-pro-lab mysql -u root -proot_password_123 --local-infile=1 < 02-schemas/06_cloud_elite_datasets_schema.sql
 docker exec -i mysql-pro-lab mysql -u root -proot_password_123 --local-infile=1 < 02-schemas/04_load_data_scripts.sql
 ```
 
@@ -52,18 +62,19 @@ The platform is deployed via automated GitHub Actions (`.github/workflows/deploy
 
 ---
 
-## 📅 The 6-Month Structured Curriculum (Powered by AWS Open Data)
+## 📅 The 6-Month Structured Curriculum (Powered by Cloud Big Data)
 
-| Month | Theme | AWS Open Data Focus | Practical Deliverable |
+| Month | Theme | Cloud Big Data Focus | Practical Deliverable |
 | :--- | :--- | :--- | :--- |
-| **Month 1** | **Advanced Analytical SQL** | Amazon Reviews (130M+ on AWS S3) & Transit | Cohort retention, RFM scoring, Boolean Full-Text Search (`+ - *`) |
-| **Month 2** | **InnoDB Internals & Deep Indexing** | AWS NYC Taxi (3M - 10M rows) | B+ tree leaf splits, covering index 100x speedup (1,850ms -> 12ms), `EXPLAIN ANALYZE` |
-| **Month 3** | **Concurrency, MVCC & Tuning** | High-throughput fare settlement & payment transactions | Multi-threaded deadlock stress test, canonical lock ordering (`LEAST`/`GREATEST`) |
-| **Month 4** | **Big Data Scaling & Partitioning** | AWS S3 (`s3://nyc-tlc/`) & Global Aviation GIS | `PARTITION BY RANGE COLUMNS(pickup_datetime)`, `ST_Distance_Sphere`, sub-10ms data aging |
-| **Month 5** | **Replication, ProxySQL & Cloud S3** | Native AWS Aurora `LOAD DATA FROM S3` | GTID replication, ProxySQL read/write splitting, Point-in-Time Recovery |
-| **Month 6** | **Portfolio Projects & Interview Drills** | 3 Production Capstones built on AWS Open Data | 3 Standout Portfolio Repositories + Staff DBA/Backend Interview Mastery |
+| **Month 1** | **Advanced Analytical SQL** | Google Stack Overflow & AWS Amazon Reviews | Tag co-occurrence self-joins, reputation windows, Boolean Full-Text Search (`+ - *`) |
+| **Month 2** | **InnoDB Internals & Deep Indexing** | Google Cloud GitHub Commits & AWS NYC Taxi | B+ tree page splits on SHA hashes, covering index 100x speedup, `EXPLAIN ANALYZE` |
+| **Month 3** | **Concurrency, MVCC & Tuning** | Google Cloud Bitcoin & Ethereum Ledger | Double-entry UTXO ledger, 100% deadlock immunity (`LEAST`/`GREATEST`), 50k TPS tuning |
+| **Month 4** | **Big Data Scaling & Partitioning** | AWS S3 (`s3://nyc-tlc/` & `s3://commoncrawl/`) | Quarterly `RANGE (TO_DAYS)` partitioning, partition pruning, sub-10ms data drops |
+| **Month 5** | **Cloud HA & AI Pretraining Pipelines** | Hugging Face FineWeb (15T Tokens) & Aurora S3 | GTID replication, ProxySQL read/write splitting, PITR, pretraining token filtering |
+| **Month 6** | **Portfolio Projects & Interview Drills** | 3 Production Capstones built on Cloud Big Data | 3 Standout Portfolio Repositories + Staff DBA/Backend Interview Mastery |
 
 Detailed weekly syllabus documents are located in the [`00-curriculum/`](00-curriculum/) directory.
+Detailed textbook lesson guides with ASCII diagrams are in [`00-curriculum/lessons/`](00-curriculum/lessons/).
 
 ---
 
@@ -93,20 +104,24 @@ mysql-pro-kit/
 ├── docker-compose.yml                         # 1-Click Multi-Container Lab (MySQL 8, Adminer)
 ├── my.cnf                                     # Production-tuned MySQL 8 configuration for 1M+ rows
 ├── 00-curriculum/
-│   ├── 01-month-1-advanced-sql.md             # Month 1: Advanced SQL, Window Functions, CTEs, JSON & Fulltext
-│   ├── 02-month-2-innodb-internals-indexing.md# Month 2: InnoDB Engine, B+ Trees, EXPLAIN ANALYZE, Covering Indexes
-│   ├── 03-month-3-transactions-locking-tuning.md# Month 3: MVCC, Isolation levels, Deadlocks, Lock Analysis, Tuning
-│   ├── 04-month-4-scaling-partitioning-bigdata.md# Month 4: Big Data, Ingestion, Partitioning, Cloud Datasets
-│   ├── 05-month-5-ha-replication-security.md  # Month 5: Replication (GTID), ProxySQL, Backups (PITR), RBAC, Encryption
-│   └── 06-month-6-portfolio-and-capstone.md   # Month 6: Building 3 Pro Portfolio Projects + Resume & Interview Prep
+│   ├── 01-month-1-advanced-sql.md             # Month 1: Advanced SQL on Stack Overflow & Amazon Reviews
+│   ├── 02-month-2-innodb-internals-indexing.md# Month 2: InnoDB B+ Trees on GitHub Commits & NYC Taxi
+│   ├── 03-month-3-transactions-locking-tuning.md# Month 3: MVCC & ACID on Bitcoin/Ethereum Blockchain
+│   ├── 04-month-4-scaling-partitioning-bigdata.md# Month 4: Big Data, RANGE Partitioning & Common Crawl
+│   ├── 05-month-5-ha-replication-security.md  # Month 5: Replication, ProxySQL & FineWeb 15T Staging
+│   ├── 06-month-6-portfolio-and-capstone.md   # Month 6: 3 Cloud Big Data Capstones + Career Prep
+│   └── lessons/                               # In-depth Textbook Lesson Guides (Weeks 1, 2, 3, 4, 6, 10, 15)
 ├── 01-datasets/
-│   ├── download_cloud_data.py                 # Real Cloud datasets downloader (NYC Taxi, Open E-commerce, etc.)
+│   ├── cloud_public_datasets_connector.py     # Master CLI connector (AWS, Google Cloud, Hugging Face)
+│   ├── cloud_big_data_sources_master_guide.md # S3 buckets, BigQuery IDs, and Hugging Face Hub catalog
 │   ├── generate_synthetic_millions.py         # High-speed synthetic generator (generates 1M-5M rows in seconds to CSV)
-│   └── data_dictionary.md                     # Comprehensive entity & field documentation for the 1M+ datasets
+│   └── data_dictionary.md                     # Comprehensive entity & field documentation for the datasets
 ├── 02-schemas/
 │   ├── 01_ecommerce_cloud_schema.sql          # Base e-commerce & analytics schema with JSON telemetry
 │   ├── 02_financial_ledger_schema.sql         # High-concurrency financial ledger schema
 │   ├── 03_partitioned_analytics_schema.sql    # RANGE & HASH partitioned big data schema
+│   ├── 05_aws_open_data_schema.sql            # AWS Taxi, Amazon Reviews FTS, and Airport GIS
+│   ├── 06_cloud_elite_datasets_schema.sql     # GitHub DAG, Stack Overflow, Blockchain UTXO & FineWeb
 │   └── 04_load_data_scripts.sql               # Ultra-fast LOAD DATA LOCAL INFILE scripts
 ├── 03-labs-and-exercises/
 │   ├── lab01_window_functions_and_ctes.sql    # 5 production-grade window function patterns & recursive CTEs

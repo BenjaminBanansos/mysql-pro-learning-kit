@@ -1,42 +1,44 @@
-# Month 2: InnoDB Internals & Deep Indexing on AWS Scale (Weeks 5 - 8)
+# Month 2: InnoDB Internals & Deep Indexing on Cloud Datasets (Weeks 5 - 8)
 
 ## Objective
-Master the internal memory and on-disk storage architecture of the MySQL InnoDB engine and engineer high-performance indexes on **multi-million row AWS Open Data tables** (NYC TLC Taxi & E-Commerce) achieving a 100x query speedup.
+Master MySQL storage engine memory and disk architecture, B+ Tree mechanics, and query execution plan optimization using multi-million record cloud datasets from the **GitHub Public Archive** (`bigquery-public-data.github_repos`) and **AWS NYC Taxi Trips** (`s3://nyc-tlc/`).
 
 ---
 
-### Week 5: InnoDB Architecture & On-Disk Structures
+### Week 5: InnoDB Memory & Disk Structures Under Heavy Write Workloads
 - **Memory Structures**:
-  - Buffer Pool: LRU list, Free list, Flush list, Buffer Pool Hit Ratio calculation on 1GB+ memory allocations.
-  - Adaptive Hash Index (AHI): When InnoDB automatically creates hash pointers for hot pages.
-  - Redo Log Buffer & Change Buffer.
+  - Buffer Pool sizing (70–80% physical RAM), LRU list (Young vs Old 5/8 split), Page Eviction policies.
+  - Change Buffer: Buffering non-unique secondary index modifications.
+  - Adaptive Hash Index (AHI) mechanics for in-memory fast lookups.
+  - Log Buffer & Write-Ahead Logging (WAL).
 - **Disk Structures**:
-  - Tablespaces: System tablespace vs `file-per-table` (`.ibd` files).
-  - Page Anatomy (16KB): File Header, Page Header, User records, Free space, Page Directory (sparse index).
-  - Doublewrite Buffer: Prevention of torn pages and partial writes.
+  - Tablespace files (`.ibd`), Segment -> Extent (1MB / 64 pages) -> Page (16KB) hierarchy.
+  - Redo Log ring buffers and Doublewrite Buffer (DWB) preventing partial page writes on hardware crash.
+- **Lab**: Inspecting `information_schema.innodb_buffer_page` and buffer pool hit ratios during cloud data ingestion.
 
-### Week 6: B+ Tree Anatomy & Leaf Page Splits
-- **B+ Tree Mechanics on AWS NYC Taxi Data (3M+ Rows)**:
-  - Clustered Index (Primary Key): Data leaf pages ordered by PK.
-  - Secondary Index: Leaves contain the secondary key value + Primary Key (the "bookmark").
-  - Leaf Page Splits: Measuring page fragmentation on high-throughput trip inserts (sequential monotonic vs random UUIDs).
-- **Index Selectivity**:
-  - Calculating cardinality: `COUNT(DISTINCT col) / COUNT(*)`.
-  - Prefix Indexing: Optimal prefix length for long string attributes.
+### Week 6: B+ Tree Anatomy & Index Selectivity on GitHub Commits
+- **B+ Tree Mechanics**:
+  - Clustered index (Primary Key = physical row organization) vs Secondary index (Leaf stores PK pointer).
+  - Page splits (50-50 splits vs sequential 15/16 appends) and page fill factors (`MERGE_THRESHOLD`).
+- **High-Cardinality Hash Indexing Pitfall**:
+  - Indexing 40-character SHA-1 commit hashes (`commit_sha`) vs auto-increment integer IDs.
+  - Measuring random I/O thrashing and leaf page fragmentation on 10M+ GitHub commit records.
+  - Index cardinality calculation: `COUNT(DISTINCT col) / COUNT(*)`.
 
-### Week 7: Covering Indexes & Leftmost Prefix Rule
-- **The Covering Index Leap on AWS NYC Taxi**:
-  - Designing a pure covering composite index on `(pickup_datetime, passenger_count, total_amount, tip_amount)`.
-  - Eliminating the secondary-to-clustered bookmark lookup: reducing execution time from **1,850ms to 12ms (100x speedup)**.
-  - Identifying `Using index` in `EXPLAIN`.
-- **The Leftmost Prefix Rule**:
-  - Column ordering strategy: Equality columns first, range columns last.
-  - Index Skip Scan in MySQL 8: When the optimizer skips leading columns.
+### Week 7: Covering Indexes & Leftmost Prefix Rule (100x Speedup)
+- **Covering Index Mastery**:
+  - Satisfying queries entirely from the secondary index tree (`Using index` in Extra) without secondary-to-clustered bookmark lookups.
+  - Composite Index Column Ordering Rule: Cardinality vs Equality filters vs Range filters.
+- **Hands-On Optimization**:
+  - Benchmarking NYC Taxi query: `SELECT pickup_location_id, pickup_datetime, total_amount FROM nyc_yellow_taxi_trips WHERE pickup_location_id = 132`.
+  - Transforming a slow 4.8s clustered scan into an instant 0.04s covering index lookup.
+  - Index Skip Scans in MySQL 8.0: Evaluating queries when prefix columns are omitted.
 
-### Week 8: Query Execution Plan Mastery (EXPLAIN ANALYZE)
-- **EXPLAIN Formats**:
-  - `EXPLAIN FORMAT=TREE` and `EXPLAIN ANALYZE` on AWS datasets.
-  - Comparing estimated costs against actual execution times (First row vs Last row) and row count loops.
-- **Access Types Ranked (Best to Worst)**:
-  `system` > `const` > `eq_ref` > `ref` > `fulltext` > `range` > `index` > `ALL` (Table scan).
-- **Eliminating `Using temporary; Using filesort`** on multi-million row aggregations.
+### Week 8: Query Execution Plan Diagnostics (`EXPLAIN ANALYZE`)
+- **`EXPLAIN` Output Matrix**:
+  - Access types: `system` > `const` > `eq_ref` > `ref` > `range` > `index` > `ALL`.
+  - Interpreting `rows` vs `filtered` ratio and eliminating dangerous temporary disk tables (`Using temporary; Using filesort`).
+- **`EXPLAIN ANALYZE` (MySQL 8.0.18+)**:
+  - Actual execution time vs Optimizer cost estimates.
+  - First-row latency (`startup cost`) vs total row delivery latency.
+  - Eliminating filesorts on multi-million row GitHub commit and Stack Overflow datasets.

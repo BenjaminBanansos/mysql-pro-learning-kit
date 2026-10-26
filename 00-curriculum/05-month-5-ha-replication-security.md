@@ -1,40 +1,36 @@
-# Month 5: High Availability, Cloud Replication & AWS S3 Integration (Weeks 17 - 20)
+# Month 5: High Availability, Cloud Replication & AI Pretraining Pipelines (Weeks 17 - 20)
 
 ## Objective
-Design and operate resilient, enterprise-grade cloud database architectures with automated replication, ProxySQL read/write splitting, point-in-time disaster recovery, and native AWS S3 integration.
+Architect multi-node database clusters with automatic failover, ProxySQL intelligent query routing, point-in-time disaster recovery, and large-scale data staging for AI & LLM pretraining using **Hugging Face Hub** (FineWeb 15T Tokens & RedPajama).
 
 ---
 
-### Week 17: MySQL Replication Architectures & GTID
-- **Binary Log Fundamentals**:
-  - Binlog Formats: `STATEMENT`, `ROW`, `MIXED`. Why `ROW` format is required for modern HA and data consistency.
-  - Three-Thread Architecture: Binlog Dump Thread (Source), I/O Thread (Replica), SQL Thread (Replica Worker).
-- **GTID-Based Replication (Global Transaction Identifiers)**:
-  - Eliminating binlog file and coordinate offset mapping.
-  - Automatic failover and repointing: `CHANGE MASTER TO MASTER_AUTO_POSITION = 1`.
-  - Semi-Synchronous Replication: Guaranteeing zero data loss.
+### Week 17: GTID-Based Replication & Semi-Synchronous Failover
+- **Replication Architecture**:
+  - Global Transaction Identifiers (GTID) eliminating manual binlog coordinate tracking (`master_log_file`, `master_log_pos`).
+  - The Three-Thread Model: Binary Log Dump thread on Master -> I/O thread on Replica (Relay Log) -> SQL Apply thread.
+- **Semi-Synchronous Replication**:
+  - Preventing split-brain scenarios and data loss by requiring ACK from at least one replica before commit.
+  - Multi-threaded replica appliers (`replica_parallel_workers = 8`).
 
-### Week 18: ProxySQL & Automated Read/Write Splitting
-- **Proxy Layer Fundamentals**:
-  - Decoupling application connection pools from backend database instances.
-  - Connection multiplexing: Serving thousands of application threads with minimal backend memory.
-- **Intelligent Query Routing**:
-  - Routing writes and `SELECT ... FOR UPDATE` to Master (Hostgroup 10).
-  - Load-balancing read queries across horizontal read replicas (Hostgroup 20).
-  - Handling replication lag: Dynamically shunning lagging nodes.
+### Week 18: ProxySQL Intelligent Read/Write Query Splitting
+- **ProxySQL Architecture**:
+  - In-memory SQLite runtime configuration and connection pooling multiplexing 10,000 clients into 50 backend connections.
+  - Query Rules engine: Routing `SELECT ... FOR UPDATE` and DML to Hostgroup 10 (Master) and analytical `SELECT` to Hostgroup 20 (Replicas).
+  - Fast query caching at the proxy layer with sub-1ms response times.
 
-### Week 19: Enterprise Backups & Point-in-Time Recovery (PITR)
-- **Backup Methodologies**:
-  - Logical: `mysqldump` with `--single-transaction --flush-logs --master-data=2`.
-  - Physical: `Percona XtraBackup` / `mysqlbackup` for zero-impact binary snapshot backups.
-- **Zero-Loss Point-in-Time Recovery**:
-  - Restoring baseline snapshot and replaying binary logs up to exact transactions.
+### Week 19: Enterprise Backups & Zero-Data-Loss Point-in-Time Recovery (PITR)
+- **Consistent Physical & Logical Backups**:
+  - `mysqldump --single-transaction --master-data=2 --quick` for zero-lock online dumps.
+  - Binary log archival and rotation policies (`binlog_expire_logs_seconds`).
+- **Disaster Recovery Playbook**:
+  - Simulating catastrophic accidental `DROP DATABASE`.
+  - Reconstructing database state to the exact second using `mysqlbinlog --stop-datetime` and coordinate replays.
 
-### Week 20: Native AWS Aurora S3 Ingestion & Cloud Security
-- **Native AWS S3 Integration**:
-  - Ingesting directly across AWS's internal 100 Gbps network without downloading files to local machines:
-    `LOAD DATA FROM S3 PREFIX 's3://nyc-tlc/...' INTO TABLE ...`.
-- **Hardened Enterprise Security**:
-  - Role-Based Access Control (RBAC): `app_readonly`, `app_write`, `db_admin`.
-  - Data-in-transit encryption (TLS / SSL enforcement).
-  - Data-at-rest encryption (InnoDB tablespace encryption).
+### Week 20: Native Cloud Ingestion & AI Pretraining Data Pipelines (FineWeb 15T Tokens)
+- **Native Cloud Storage Ingestion**:
+  - Ingesting directly from AWS S3 using Amazon Aurora `LOAD DATA FROM S3 PREFIX 's3://...'`.
+  - Google Cloud Storage (GCS) parallel staging pipelines into Cloud SQL MySQL.
+- **AI / LLM Pretraining Staging Pipeline (Hugging Face FineWeb)**:
+  - Storing token vocabulary counts, document character lengths, and quality filters across millions of pretraining documents.
+  - Filtering low-quality web scrapes in MySQL 8 before feeding LLM tokenizers (saving thousands of GPU training hours).
