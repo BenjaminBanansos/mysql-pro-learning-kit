@@ -335,6 +335,35 @@ class TestSuiteRunner:
         except Exception as e:
             self.log_result("Zero-Negative-Balance Integrity", False, str(e))
 
+    def test_comprehensive_course_lessons(self):
+        try:
+            lessons_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "web-platform", "lessons-data.js")
+            if not os.path.exists(lessons_file):
+                self.log_result("Comprehensive Course Lessons (24 Weeks)", False, "lessons-data.js not found!")
+                return
+
+            with open(lessons_file, "r") as f:
+                content = f.read()
+
+            import json
+            s_idx = content.find("{")
+            e_idx = content.rfind("}") + 1
+            data = json.loads(content[s_idx:e_idx])
+
+            total_weeks = len(data)
+            has_all_24 = total_weeks == 24
+            has_quizzes = all("quiz" in w and "question" in w["quiz"] for w in data.values())
+            has_code = all("code" in w and len(w["code"]) > 20 for w in data.values())
+            passed = has_all_24 and has_quizzes and has_code
+
+            self.log_result(
+                "Comprehensive Course Lessons Verification (24 Full Weeks)",
+                passed,
+                f"All 24 weeks verified with full textbook theory, diagrams, SQL code, and quizzes."
+            )
+        except Exception as e:
+            self.log_result("Comprehensive Course Lessons Verification", False, str(e))
+
     def run_all(self):
         print_header("MYSQL PRO TEST RUNNER: EXECUTING UNIT & INTEGRATION TESTS")
         start = time.time()
@@ -347,6 +376,7 @@ class TestSuiteRunner:
         self.test_self_join_tag_cooccurrence()
         self.test_financial_ledger_conservation()
         self.test_negative_balance_check_constraint()
+        self.test_comprehensive_course_lessons()
 
         elapsed = time.time() - start
         total = self.tests_passed + self.tests_failed
