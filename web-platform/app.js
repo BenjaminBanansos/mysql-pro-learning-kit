@@ -9,78 +9,35 @@ let currentTab = 'curriculum';
 let activeModalWeek = 1;
 
 // ------------------------------------------------------------------------
-// 1. Curriculum Structure (6 Months / 24 Weeks)
+// 1. Curriculum Structure (10 Core Master Chapters)
 // ------------------------------------------------------------------------
 const CURRICULUM = [
   {
-    month: 1,
-    title: "Month 1: Advanced Analytical SQL on Cloud Big Data",
-    focus: "Bridging intermediate SQL to advanced analytics using Google Cloud Stack Overflow, GitHub DAGs, and AWS Amazon Reviews.",
-    weeks: [
-      { week: 1, title: "Execution Order & Self-Joins (Stack Overflow Tags)", desc: "Understanding the FROM -> WHERE -> GROUP BY -> SELECT order, Self Joins on tag co-occurrence matrix, and MySQL 8 Hash Joins." },
-      { week: 2, title: "Window Functions & Analytical Velocity (NYC Taxi & SO)", desc: "ROW_NUMBER, RANK, DENSE_RANK, NTILE, LAG, LEAD, and sliding window frame specifications on developer reputation trajectories." },
-      { week: 3, title: "Recursive CTEs & Git Commit Hierarchical DAGs", desc: "Recursive CTEs for traversing GitHub parent-child commit histories, multi-hop fork networks, and dynamic calendar series." },
-      { week: 4, title: "MySQL 8 Native JSON & Full-Text Search (130M+ Amazon Reviews)", desc: "JSON extraction (->, ->>), JSON_TABLE relational projection, virtual column indexing, and Boolean Mode FTS on 130M+ Amazon Reviews." }
+    part: 1,
+    partTitle: "Part 1: Zero-to-One Foundations & Cloud Data Ingestion",
+    description: "Start from absolute zero: understand databases vs. spreadsheets, cloud storage containers (AWS S3, BigQuery, Hugging Face), table design, and bulk data loading.",
+    chapters: [
+      { chapter: 1, title: "Zero-to-One Foundations: What is Data, Databases & SQL?", desc: "Spreadsheets vs. RDBMS, Table Anatomy, Rows, Columns, Primary Keys, and Declarative Querying.", badge: "Foundations", cloud: "Core Relational Engine", time: "45 min" },
+      { chapter: 2, title: "The Modern Cloud Big Data Ecosystem & Containers", desc: "AWS S3 Open Data (NYC Taxi, Amazon Reviews), GCP BigQuery, Hugging Face Hub (FineWeb), CSV vs. Parquet.", badge: "Cloud Architecture", cloud: "AWS S3 & BigQuery", time: "50 min" },
+      { chapter: 3, title: "Fetching Data from Cloud Containers (Hands-On Connection Guide)", desc: "Step-by-step downloading using aws s3 cp --no-sign-request, curl, and the master Python connector script.", badge: "Cloud Connection", cloud: "AWS CLI & curl", time: "50 min" },
+      { chapter: 4, title: "Designing the Table Blueprint (DDL & Data Types)", desc: "CREATE TABLE, choosing INT vs. BIGINT, VARCHAR, DECIMAL(10,2) for money, and CHECK constraints.", badge: "Schema Design", cloud: "MySQL 8 DDL", time: "55 min" },
+      { chapter: 5, title: "Blazing-Fast Ingestion: Loading Cloud Data into MySQL", desc: "LOAD DATA LOCAL INFILE, delimiters, escaping quotes, skipping header rows, and 100,000+ rows/sec bulk loading.", badge: "Bulk Loading", cloud: "LOAD DATA INFILE", time: "50 min" }
     ]
   },
   {
-    month: 2,
-    title: "Month 2: InnoDB Internals & Deep Indexing on GitHub Commits",
-    focus: "Mastering storage engine memory/disk architecture, B+ Tree mechanics, and EXPLAIN ANALYZE on TBs of GitHub commits & NYC Taxi trips.",
-    weeks: [
-      { week: 5, title: "InnoDB Memory & Disk Structures Under Heavy Writes", desc: "Buffer Pool LRU lists, Redo Log Buffer, Change Buffer, 16KB Page anatomy, and Doublewrite Buffer during big data streaming." },
-      { week: 6, title: "B+ Tree Anatomy & Leaf Page Splits on Git/Crypto Hashes", desc: "Clustered indexes vs secondary indexes, 50-50 leaf page splits from random SHA-1 / SHA-256 hashes, and binary storage packing." },
-      { week: 7, title: "Covering Indexes & Leftmost Prefix Rule (100x Speedup)", desc: "Eliminating clustered index bookmark lookups on NYC Taxi queries, composite index ordering, and MySQL 8 Index Skip Scans." },
-      { week: 8, title: "Query Execution Plan Mastery (EXPLAIN ANALYZE)", desc: "Analyzing actual time vs estimated cost, loops, access types (ref, range, eq_ref), and eliminating filesorts on 10M+ records." }
-    ]
-  },
-  {
-    month: 3,
-    title: "Month 3: Concurrency, MVCC & ACID on Blockchain Ledgers",
-    focus: "ACID isolation guarantees, row-level locking, deadlock prevention, and production tuning for high-throughput Bitcoin & Ethereum transactions.",
-    weeks: [
-      { week: 9, title: "ACID, WAL & Crash Recovery Tuning on Crypto Ledgers", desc: "Undo log rollbacks, redo log WAL, and tuning innodb_flush_log_at_trx_commit vs sync_binlog for 50,000+ TPS." },
-      { week: 10, title: "Isolation Levels & MVCC Snapshot Mechanics", desc: "Read Committed vs Repeatable Read, DB_TRX_ID, DB_ROLL_PTR, and Read View lifecycle under concurrent block arrivals." },
-      { week: 11, title: "Locking Internals & Canonical Deadlock Immunity", desc: "Record Locks, Gap Locks, Next-Key Locks, and mathematical deadlock immunity using LEAST(addr_a, addr_b) canonical ordering." },
-      { week: 12, title: "Production Server Tuning & Slow Query Logs", desc: "Buffer Pool sizing (70-80% RAM), pt-query-digest, slow query threshold profiling (long_query_time = 0.05)." }
-    ]
-  },
-  {
-    month: 4,
-    title: "Month 4: Big Data Scaling, Partitioning & Petabytes (NYC Taxi & Common Crawl)",
-    focus: "Ingesting and managing hundreds of millions of records using partitioning on public S3 datasets (s3://nyc-tlc/ & s3://commoncrawl/).",
-    weeks: [
-      { week: 13, title: "High-Speed Bulk Ingestion & Cloud Streaming", desc: "Optimizing LOAD DATA LOCAL INFILE, bulk insert batching, and streaming directly from public S3 / BigQuery in seconds." },
-      { week: 14, title: "Spatial GIS Analytics on Urban Transit & Global Networks", desc: "AWS Open Data NYC Taxi and aviation data; R-Tree spatial indexes and ST_Distance_Sphere." },
-      { week: 15, title: "Table Partitioning Architecture on Billions of NYC Taxi Trips", desc: "RANGE, LIST, and HASH partitioning on NYC Taxi pickup dates; strict rules requiring partition keys in all unique/primary keys." },
-      { week: 16, title: "Partition Pruning & Zero-Downtime Data Lifecycle Aging", desc: "Proving partition elimination in EXPLAIN; instant sub-10ms data drops via ALTER TABLE DROP PARTITION without redo bloat." }
-    ]
-  },
-  {
-    month: 5,
-    title: "Month 5: Cloud HA, Replication & Hugging Face FineWeb Pipelines",
-    focus: "Multi-node replication, ProxySQL query routing, point-in-time disaster recovery, and LLM pretraining data staging (FineWeb 15T tokens).",
-    weeks: [
-      { week: 17, title: "GTID-Based Replication & Semi-Sync Failover", desc: "Row-based binary logging, three-thread replication architecture, and automated GTID failover across regions." },
-      { week: 18, title: "ProxySQL & Automated Read/Write Splitting", desc: "Connection multiplexing, routing SELECT ... FOR UPDATE to master, and shunning lagging replicas." },
-      { week: 19, title: "Enterprise Backups & Zero-Data-Loss Point-in-Time Recovery", desc: "mysqldump --single-transaction, binlog coordinate extraction, and point-in-time recovery to the second." },
-      { week: 20, title: "Native Cloud S3 Ingestion & FineWeb 15T Pretrain Staging", desc: "Native LOAD DATA FROM S3 in Aurora/RDS, token vocabulary frequency tables, and quality filtering before LLM tokenization." }
-    ]
-  },
-  {
-    month: 6,
-    title: "Month 6: Capstone Portfolio Projects on Cloud Big Data",
-    focus: "Benchmarking 3 production projects built on Google Cloud GitHub/Crypto, AWS Open Data, and Hugging Face FineWeb.",
-    weeks: [
-      { week: 21, title: "Project 1: Global Developer Ecosystem Analytics Engine", desc: "GitHub Public Archive + Stack Overflow 10M+ records, covering index 100x speedup, and Git DAG recursive traversal." },
-      { week: 22, title: "Project 2: Institutional Blockchain Ledger & ACID Settlement", desc: "Bitcoin/Ethereum UTXO model, 50-thread stress testing, 100% deadlock immunity, and sliding-window AML fraud detection." },
-      { week: 23, title: "Project 3: Petabyte Web & LLM Pretraining Data Pipeline", desc: "Common Crawl WARC metadata, Hugging Face FineWeb 15T tokens, ProxySQL clustering, and native Aurora S3 pipelines." },
-      { week: 24, title: "Portfolio Launch, Resume Bullets & Technical Interview Mastery", desc: "Packaging GitHub repos, publishing LinkedIn technical breakdown, and drilling all 50 Pro interview Q&As." }
+    part: 2,
+    partTitle: "Part 2: Relational Queries, Grouping, Joins & Advanced Analytics",
+    description: "Master querying real cloud records: projecting with SELECT, filtering with WHERE, summarizing with GROUP BY, joining tables, and analytical Window Functions.",
+    chapters: [
+      { chapter: 6, title: "Reading & Projecting Data (SELECT, LIMIT, ORDER BY)", desc: "Projecting specific columns, avoiding SELECT * in production, safe pagination with LIMIT, and sorting with ORDER BY.", badge: "Query Fundamentals", cloud: "E-Commerce Orders", time: "50 min" },
+      { chapter: 7, title: "Filtering Real Records: The WHERE Clause & Logic", desc: "Comparison operators, LIKE wildcards, IN, BETWEEN, compound AND/OR logic, and the 3-valued NULL trap.", badge: "Filtering & Logic", cloud: "Stack Overflow & GitHub", time: "55 min" },
+      { chapter: 8, title: "Data Summarization: Aggregate Functions & GROUP BY", desc: "COUNT, SUM, AVG, MIN, MAX, grouping categories with GROUP BY, and the critical difference between WHERE and HAVING.", badge: "Data Aggregations", cloud: "Amazon 130M+ Reviews", time: "55 min" },
+      { chapter: 9, title: "Combining Datasets: Relational Joins & Engine Pipeline", desc: "Normalization, INNER JOIN, LEFT JOIN, Self-Joins, and the 10-step internal query engine processing pipeline.", badge: "Relational Joins", cloud: "GitHub DAGs & Orders", time: "60 min" },
+      { chapter: 10, title: "Advanced Analytics, Window Functions & Real-World Capstone", desc: "Analytical Window Functions (ROW_NUMBER, DENSE_RANK, LAG, LEAD), running totals, and 10 graduation practice challenges.", badge: "Analytics & Capstone", cloud: "Multi-Cloud Capstone", time: "60 min" }
     ]
   }
 ];
 
-// ------------------------------------------------------------------------
 // 2. Comprehensive Course Lesson Content (Weeks 1 to 24)
 // ------------------------------------------------------------------------
 const LESSON_DETAILS = window.LESSON_DETAILS || {};
@@ -582,40 +539,43 @@ function renderCurriculum() {
   const container = document.getElementById('curriculum-container');
   const savedProgress = JSON.parse(localStorage.getItem('mysql_pro_progress') || '{}');
 
-  container.innerHTML = CURRICULUM.map(m => `
-    <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow-md">
-      <div class="bg-slate-800/70 p-4 border-b border-slate-800 flex items-center justify-between">
+  container.innerHTML = CURRICULUM.map(p => `
+    <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg space-y-4">
+      <div class="bg-gradient-to-r from-slate-800/90 to-slate-900/90 p-5 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
         <div>
-          <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Month ${m.month}</span>
-          <h3 class="text-base font-bold text-white mt-0.5">${m.title}</h3>
+          <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">${p.partTitle.split(':')[0]}</span>
+          <h3 class="text-base sm:text-lg font-bold text-white mt-0.5">${p.partTitle.split(':')[1] || p.partTitle}</h3>
         </div>
-        <span class="text-xs bg-slate-800 px-2.5 py-1 rounded-full text-slate-400 font-mono">4 Weeks</span>
+        <span class="text-xs bg-cyan-950 text-cyan-300 border border-cyan-800 px-3 py-1 rounded-full font-mono font-bold">${p.chapters.length} Chapters</span>
       </div>
-      <div class="p-4 space-y-3">
-        <p class="text-xs text-slate-400">${m.focus}</p>
-        <div class="space-y-3 pt-2">
-          ${m.weeks.map(w => {
-            const isDone = !!savedProgress[`w_${w.week}`];
+      <div class="p-5 space-y-4">
+        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">${p.description}</p>
+        <div class="space-y-3 pt-1">
+          ${p.chapters.map(ch => {
+            const isDone = !!savedProgress[`ch_${ch.chapter}`];
             return `
-              <div class="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/90 hover:border-cyan-500/50 transition-all space-y-2.5">
-                <div class="flex items-start justify-between">
-                  <div class="flex items-center space-x-2.5 cursor-pointer" onclick="openLessonModal(${w.week})">
-                    <span class="px-2 py-0.5 text-[10px] font-bold rounded bg-cyan-950 text-cyan-400 border border-cyan-800">Week ${w.week}</span>
-                    <span class="text-xs font-bold text-white hover:text-cyan-400 transition-colors ${isDone ? 'line-through text-slate-500' : ''}">
-                      ${w.title}
+              <div class="p-4 rounded-xl bg-slate-950/80 border border-slate-800/90 hover:border-cyan-500/50 transition-all space-y-2.5">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="flex items-center space-x-2.5 cursor-pointer" onclick="openLessonModal(${ch.chapter})">
+                    <span class="px-2.5 py-0.5 text-xs font-bold rounded-lg bg-cyan-950 text-cyan-400 border border-cyan-800 shrink-0">Ch ${ch.chapter}</span>
+                    <span class="text-xs sm:text-sm font-bold text-white hover:text-cyan-400 transition-colors ${isDone ? 'line-through text-slate-500' : ''}">
+                      ${ch.title}
                     </span>
                   </div>
-                  <input type="checkbox" id="w_${w.week}" ${isDone ? 'checked' : ''} onchange="toggleWeekProgress(${w.week})" 
-                    class="h-4 w-4 rounded border-slate-700 text-cyan-500 focus:ring-cyan-400 bg-slate-900 cursor-pointer" title="Toggle Completion">
+                  <input type="checkbox" id="ch_${ch.chapter}" ${isDone ? 'checked' : ''} onchange="toggleChapterProgress(${ch.chapter})" 
+                    class="h-4 w-4 rounded border-slate-700 text-cyan-500 focus:ring-cyan-400 bg-slate-900 cursor-pointer shrink-0" title="Toggle Completion">
                 </div>
-                <p class="text-[11px] text-slate-400 leading-relaxed cursor-pointer" onclick="openLessonModal(${w.week})">
-                  ${w.desc}
+                <p class="text-xs text-slate-400 leading-relaxed cursor-pointer" onclick="openLessonModal(${ch.chapter})">
+                  ${ch.desc}
                 </p>
-                <div class="pt-1 flex items-center justify-between border-t border-slate-900">
-                  <button onclick="openLessonModal(${w.week})" class="px-3 py-1 rounded-lg bg-cyan-600/20 hover:bg-cyan-600 text-cyan-300 hover:text-white text-xs font-semibold border border-cyan-500/30 transition-all flex items-center shadow-sm">
-                    <i class="fa-solid fa-book-open mr-1.5"></i>Start Course Lesson
+                <div class="pt-2 flex flex-wrap items-center justify-between gap-2 border-t border-slate-900">
+                  <div class="flex items-center space-x-2 text-[11px] text-slate-400">
+                    <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 font-mono">${ch.badge}</span>
+                    <span class="text-cyan-400 font-mono"><i class="fa-solid fa-cloud mr-1"></i>${ch.cloud}</span>
+                  </div>
+                  <button onclick="openLessonModal(${ch.chapter})" class="px-3.5 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold transition-all flex items-center shadow-md">
+                    <i class="fa-solid fa-book-open mr-1.5"></i>Start Chapter Study
                   </button>
-                  <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800 flex items-center"><i class="fa-solid fa-layer-group mr-1 text-cyan-400"></i>10 Chapters</span>
                 </div>
               </div>
             `;
@@ -628,38 +588,47 @@ function renderCurriculum() {
   updateProgressStats();
 }
 
-function toggleWeekProgress(weekNum) {
+function toggleChapterProgress(chapterNum) {
   const savedProgress = JSON.parse(localStorage.getItem('mysql_pro_progress') || '{}');
-  savedProgress[`w_${weekNum}`] = !savedProgress[`w_${weekNum}`];
+  savedProgress[`ch_${chapterNum}`] = !savedProgress[`ch_${chapterNum}`];
   localStorage.setItem('mysql_pro_progress', JSON.stringify(savedProgress));
   renderCurriculum();
   updateModalCompleteBtnState();
 }
 
+function toggleWeekProgress(w) {
+  toggleChapterProgress(w);
+}
+
 function updateProgressStats() {
   const savedProgress = JSON.parse(localStorage.getItem('mysql_pro_progress') || '{}');
-  const completed = Object.values(savedProgress).filter(Boolean).length;
-  const pct = Math.round((completed / 24) * 100);
+  const completed = Object.keys(savedProgress).filter(k => (k.startsWith('ch_') || k.startsWith('w_')) && savedProgress[k]).length;
+  const total = 10;
+  const pct = Math.min(100, Math.round((completed / total) * 100));
 
-  document.getElementById('header-progress').innerText = `${pct}%`;
-  document.getElementById('tracker-status').innerText = `${completed} / 24 Weeks Completed (${pct}%)`;
-  document.getElementById('tracker-bar').style.width = `${pct}%`;
+  const headerProgress = document.getElementById('header-progress');
+  if (headerProgress) headerProgress.innerText = `${pct}%`;
+
+  const trackerStatus = document.getElementById('tracker-status');
+  if (trackerStatus) trackerStatus.innerText = `${completed} / 10 Chapters Completed (${pct}%)`;
+
+  const trackerBar = document.getElementById('tracker-bar');
+  if (trackerBar) trackerBar.style.width = `${pct}%`;
 }
 
 // ------------------------------------------------------------------------
-// 9. Lesson Course Player Modal Controls (10 Chapters per Lesson)
+// 9. 10-Chapter Masterclass Modal Controls
 // ------------------------------------------------------------------------
 let activeModalChapter = 1;
-let modalViewMode = 'single'; // 'single' or 'all'
 
 function initModalWeekSelector() {
   const sel = document.getElementById('modal-week-selector');
   if (!sel || sel.children.length > 0) return;
-  for (let w = 1; w <= 24; w++) {
-    const l = LESSON_DETAILS[w];
+  for (let c = 1; c <= 10; c++) {
+    const l = LESSON_DETAILS[c];
     const opt = document.createElement('option');
-    opt.value = w;
-    opt.innerText = l ? `Week ${w}: ${l.title.replace(/^Week \d+:\s*/, '')}` : `Week ${w}`;
+    opt.value = c;
+    opt.innerText = l ? `Chapter ${c}: ${l.badge}` : `Chapter ${c}`;
     sel.appendChild(opt);
   }
 }
@@ -674,11 +643,11 @@ function formatChapterMarkdown(md) {
   // Code blocks: ```(lang)?
 ([\s\S]*?)```
   s = s.replace(/```([a-zA-Z0-9_\-]*)?\n([\s\S]*?)```/g, (match, lang, code) => {
-    const l = lang ? lang.toUpperCase() : 'CODE';
+    const l = lang ? lang.toUpperCase() : 'SQL';
     return `<div class="my-3 rounded-xl overflow-hidden border border-slate-700 bg-slate-950 shadow-md">
       <div class="bg-slate-800/80 px-3.5 py-1.5 border-b border-slate-700 flex items-center justify-between text-[11px] font-mono text-cyan-400">
         <span><i class="fa-solid fa-code mr-1.5"></i>${l}</span>
-        <button onclick="navigator.clipboard.writeText(this.closest('.my-3').querySelector('code').innerText); alert('Code snippet copied!');" class="text-slate-400 hover:text-white text-[10px] px-2 py-0.5 rounded bg-slate-700/50 hover:bg-slate-700 transition-colors">Copy</button>
+        <button onclick="navigator.clipboard.writeText(this.closest('.my-3').querySelector('code').innerText); alert('Code snippet copied to clipboard!');" class="text-slate-400 hover:text-white text-[10px] px-2 py-0.5 rounded bg-slate-700/50 hover:bg-slate-700 transition-colors">Copy</button>
       </div>
       <pre class="p-3.5 text-xs font-mono text-cyan-200 overflow-x-auto leading-relaxed whitespace-pre"><code>${code.trim()}</code></pre>
     </div>`;
@@ -728,11 +697,9 @@ function runQueryInPlayground(query) {
 }
 
 function runChapterSolutionInPlayground(chNum) {
-  const lesson = LESSON_DETAILS[activeModalWeek];
-  if (!lesson || !lesson.chapters) return;
-  const ch = lesson.chapters.find(c => c.chapter === chNum);
-  if (!ch || !ch.solution) return;
-  runQueryInPlayground(ch.solution);
+  const lesson = LESSON_DETAILS[chNum];
+  if (!lesson || !lesson.solution) return;
+  runQueryInPlayground(lesson.solution);
 }
 
 function toggleChapterSolution(chNum) {
@@ -749,425 +716,258 @@ function toggleChapterSolution(chNum) {
   }
 }
 
-function setModalChapter(chNum) {
-  activeModalChapter = chNum;
-  renderLessonModalBody(activeModalWeek);
-  const body = document.getElementById('modal-lesson-body');
-  if (body) body.scrollTop = 0;
-}
+function openLessonModal(chapterNum) {
+  chapterNum = parseInt(chapterNum) || 1;
+  if (chapterNum < 1) chapterNum = 1;
+  if (chapterNum > 10) chapterNum = 10;
+  activeModalChapter = chapterNum;
 
-function toggleModalViewMode() {
-  modalViewMode = (modalViewMode === 'single') ? 'all' : 'single';
-  renderLessonModalBody(activeModalWeek);
-}
-
-function openLessonModal(weekNum, chapterNum) {
-  activeModalWeek = weekNum;
-  if (chapterNum !== undefined) {
-    activeModalChapter = chapterNum;
-  } else if (!activeModalChapter || activeModalChapter < 1 || activeModalChapter > 10) {
-    activeModalChapter = 1;
-  }
-  const lesson = LESSON_DETAILS[weekNum];
+  const lesson = LESSON_DETAILS[chapterNum];
   if (!lesson) return;
 
   initModalWeekSelector();
   const weekSel = document.getElementById('modal-week-selector');
-  if (weekSel) weekSel.value = weekNum;
+  if (weekSel) weekSel.value = chapterNum;
 
   const modal = document.getElementById('lesson-modal');
-  document.getElementById('modal-month-badge').innerText = `Month ${lesson.month} • Week ${weekNum}`;
+  document.getElementById('modal-month-badge').innerText = `Chapter ${chapterNum} of 10 • ${lesson.badge}`;
   document.getElementById('modal-lesson-title').innerText = lesson.title;
 
-  renderLessonModalBody(weekNum);
-
-  // Update navigation buttons
-  document.getElementById('modal-prev-btn').disabled = (weekNum === 1);
-  document.getElementById('modal-prev-btn').style.opacity = (weekNum === 1) ? "0.4" : "1.0";
-  document.getElementById('modal-next-btn').disabled = (weekNum === 24);
-  document.getElementById('modal-next-btn').style.opacity = (weekNum === 24) ? "0.4" : "1.0";
-
-  updateModalCompleteBtnState();
-  modal.classList.remove('hidden');
-}
-
-function renderLessonModalBody(weekNum) {
-  const lesson = LESSON_DETAILS[weekNum];
-  if (!lesson) return;
   const body = document.getElementById('modal-lesson-body');
   if (!body) return;
 
-  const chapters = lesson.chapters || [];
-  const totalChapters = chapters.length;
+  // 1. Navigation Pills Bar (Chapters 1 to 10)
+  const pillsHTML = `
+    <div class="space-y-2">
+      <div class="flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider">
+        <span class="flex items-center">
+          <i class="fa-solid fa-layer-group text-cyan-400 mr-2"></i>10-Chapter Masterclass
+        </span>
+        <span class="text-[11px] font-mono text-cyan-400">Chapter ${chapterNum} of 10</span>
+      </div>
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-thin">
+        ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(c => {
+          const l = LESSON_DETAILS[c];
+          const isActive = (c === chapterNum);
+          const shortName = l ? l.badge : `Ch ${c}`;
+          return `
+            <button onclick="openLessonModal(${c})" 
+              class="px-3 py-1.5 rounded-lg text-xs whitespace-nowrap transition-all flex items-center space-x-1.5 shrink-0 ${
+                isActive 
+                  ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold shadow-md shadow-cyan-950 border border-cyan-400' 
+                  : 'bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-slate-800'
+              }">
+              <span class="font-mono text-[10px] px-1.5 py-0.2 rounded ${isActive ? 'bg-white/20' : 'bg-slate-800'}">Ch ${c}</span>
+              <span class="truncate max-w-[130px] sm:max-w-[160px]">${shortName}</span>
+            </button>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
 
-  // 1. Header Card with Reading Time, Cloud Container, Chapters count & Mode Switcher
-  let headerHTML = `
+  // 2. Chapter Header Card
+  const headerHTML = `
     <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3 shadow-lg">
       <div class="flex flex-wrap items-center justify-between gap-2.5 text-xs">
         <div class="flex items-center space-x-2 text-cyan-400 font-semibold">
           <i class="fa-solid fa-clock"></i>
-          <span>Study Duration: ${lesson.time || '60 min deep study'}</span>
+          <span>Study Duration: ${lesson.time || '50 min study'}</span>
         </div>
-        <div class="flex items-center space-x-2">
-          ${lesson.cloudDataset ? `
-            <div class="px-2.5 py-1 rounded-full bg-cyan-950/90 text-cyan-300 border border-cyan-800 text-[11px] font-semibold flex items-center">
-              <i class="fa-solid fa-cloud-arrow-down mr-1.5 text-cyan-400"></i>${lesson.cloudDataset.split('(')[0].trim()}
-            </div>
-          ` : ''}
-          ${totalChapters > 0 ? `
-            <span class="px-2.5 py-1 rounded-full bg-blue-950/90 text-blue-300 border border-blue-800 text-[11px] font-bold flex items-center">
-              <i class="fa-solid fa-layer-group mr-1.5 text-blue-400"></i>${totalChapters} Chapters
-            </span>
-          ` : ''}
-        </div>
-      </div>
-      <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans">${lesson.overview}</p>
-      
-      ${totalChapters > 0 ? `
-        <div class="pt-2 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2">
-          <span class="text-[11px] text-slate-400 flex items-center">
-            <i class="fa-solid fa-circle-info text-cyan-400 mr-1.5"></i>
-            Zero-knowledge friendly: every chapter includes guided theory, architecture diagrams & exercises.
-          </span>
-          <button onclick="toggleModalViewMode()" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all flex items-center space-x-1.5">
-            <i class="fa-solid ${modalViewMode === 'single' ? 'fa-book-open text-cyan-400' : 'fa-list-check text-blue-400'}"></i>
-            <span>${modalViewMode === 'single' ? 'View All 10 Chapters' : 'Chapter-by-Chapter Stepper'}</span>
-          </button>
-        </div>
-      ` : ''}
-    </div>
-  `;
-
-  // 2. Chapters Navigation Pills Bar (if chapters exist)
-  let chapterNavHTML = "";
-  if (totalChapters > 0) {
-    chapterNavHTML = `
-      <div class="space-y-2">
-        <div class="flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider">
-          <span class="flex items-center">
-            <i class="fa-solid fa-bookmark text-cyan-400 mr-2"></i>Curriculum Chapters
-          </span>
-          <span class="text-[11px] font-mono text-cyan-400">
-            ${modalViewMode === 'single' ? `Viewing Chapter ${activeModalChapter} of ${totalChapters}` : `All ${totalChapters} Chapters Expanded`}
-          </span>
-        </div>
-        <div class="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-thin">
-          ${chapters.map(ch => {
-            const isActive = (modalViewMode === 'single' && ch.chapter === activeModalChapter);
-            const shortTitle = ch.title.replace(/^Chapter \d+:\s*/, '');
-            return `
-              <button onclick="if(modalViewMode==='all'){modalViewMode='single';} setModalChapter(${ch.chapter});" 
-                class="px-3 py-1.5 rounded-lg text-xs whitespace-nowrap transition-all flex items-center space-x-1.5 shrink-0 ${
-                  isActive 
-                    ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold shadow-md shadow-cyan-950 border border-cyan-400' 
-                    : 'bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-slate-800'
-                }">
-                <span class="font-mono text-[10px] px-1.5 py-0.2 rounded ${isActive ? 'bg-white/20' : 'bg-slate-800'}">Ch ${ch.chapter}</span>
-                <span class="truncate max-w-[140px] sm:max-w-[180px]">${shortTitle}</span>
-              </button>
-            `;
-          }).join('')}
-        </div>
-      </div>
-    `;
-  }
-
-  // 3. Chapter Content Section
-  let chapterBodyHTML = "";
-  if (totalChapters > 0) {
-    if (modalViewMode === 'single') {
-      const ch = chapters.find(c => c.chapter === activeModalChapter) || chapters[0];
-      const hasSql = isSqlStatement(ch.solution);
-      chapterBodyHTML = `
-        <div class="space-y-5 bg-slate-950/80 p-5 sm:p-6 rounded-2xl border border-slate-800 shadow-xl">
-          <!-- Chapter Header -->
-          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
-            <span class="px-2.5 py-1 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800 text-xs font-semibold flex items-center">
-              <i class="fa-solid fa-graduation-cap text-cyan-400 mr-1.5"></i>${ch.badge || 'Core Fundamental'}
-            </span>
-            <span class="text-xs font-mono text-slate-400 flex items-center">
-              <i class="fa-solid fa-book-reader mr-1.5 text-cyan-400"></i>Chapter ${ch.chapter} of ${totalChapters} (${Math.round((ch.chapter / totalChapters) * 100)}%)
-            </span>
-          </div>
-
-          <h3 class="text-lg sm:text-xl font-bold text-white flex items-center">
-            ${ch.title}
-          </h3>
-
-          <!-- Chapter Overview -->
-          <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 text-xs sm:text-sm text-cyan-200/90 leading-relaxed font-sans shadow-inner">
-            <span class="font-bold text-cyan-400 block mb-1 uppercase tracking-wider text-[11px]"><i class="fa-solid fa-compass mr-1.5"></i>Chapter Overview:</span>
-            ${ch.overview}
-          </div>
-
-          <!-- Chapter Detailed Content -->
-          <div class="chapter-content text-xs sm:text-sm text-slate-200 leading-relaxed space-y-3 font-sans">
-            ${formatChapterMarkdown(ch.content)}
-          </div>
-
-          <!-- Architecture & Data Flow Diagram -->
-          ${ch.diagram ? `
-            <div class="my-4">
-              <div class="text-[11px] font-bold uppercase tracking-wider text-cyan-400 mb-1.5 flex items-center">
-                <i class="fa-solid fa-diagram-project mr-1.5"></i>Architecture & Data Flow Diagram
-              </div>
-              <pre class="bg-slate-950 p-4 rounded-xl border border-cyan-900/50 font-mono text-[11px] sm:text-xs text-cyan-300 overflow-x-auto shadow-inner leading-relaxed"><code>${ch.diagram}</code></pre>
-            </div>
-          ` : ''}
-
-          <!-- Key Takeaways / Production Rules -->
-          ${ch.takeaways && ch.takeaways.length > 0 ? `
-            <div class="my-4 space-y-2 bg-slate-900/80 p-4 rounded-xl border border-slate-800">
-              <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center">
-                <i class="fa-solid fa-key mr-2 text-cyan-400"></i>Key Rules & Beginner Invariants:
-              </span>
-              <ul class="list-disc list-inside space-y-1.5 text-xs text-slate-300 pt-1">
-                ${ch.takeaways.map(t => `<li class="leading-relaxed">${t}</li>`).join('')}
-              </ul>
-            </div>
-          ` : ''}
-
-          <!-- Hands-On Challenge & Guided Exercise -->
-          ${ch.exercise ? `
-            <div class="my-4 p-5 rounded-xl bg-gradient-to-r from-cyan-950/30 via-slate-900 to-slate-950 border border-cyan-800/60 shadow-lg space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center">
-                  <i class="fa-solid fa-laptop-code text-cyan-400 mr-2"></i>Chapter ${ch.chapter} Hands-On Challenge
-                </span>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">
-                  Guided Exercise
-                </span>
-              </div>
-              <div class="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans">
-                ${formatChapterMarkdown(ch.exercise)}
-              </div>
-
-              <!-- Solution Reveal Accordion -->
-              ${ch.solution ? `
-                <div class="pt-3 border-t border-slate-800 flex flex-col space-y-2">
-                  <div class="flex flex-wrap items-center gap-2">
-                    <button onclick="toggleChapterSolution(${ch.chapter})" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-cyan-300 hover:text-white border border-slate-700 transition-all flex items-center space-x-1.5">
-                      <i class="fa-solid fa-lightbulb text-amber-400"></i>
-                      <span id="sol-btn-label-${ch.chapter}">Show Solution & Code</span>
-                    </button>
-                    ${hasSql ? `
-                      <button onclick="runChapterSolutionInPlayground(${ch.chapter})" class="px-3.5 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition-all shadow-md flex items-center">
-                        <i class="fa-solid fa-play mr-1.5"></i>Run in SQL Playground
-                      </button>
-                    ` : ''}
-                  </div>
-                  <div id="sol-box-${ch.chapter}" class="hidden mt-2 p-4 rounded-xl bg-slate-950 border border-emerald-900/50 space-y-2">
-                    <div class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider flex items-center justify-between">
-                      <span><i class="fa-solid fa-check-circle mr-1.5"></i>Solution & Explanation:</span>
-                      <button onclick="navigator.clipboard.writeText(document.getElementById('sol-text-${ch.chapter}').innerText); alert('Solution copied to clipboard!');" class="text-slate-400 hover:text-white text-[10px] px-2 py-0.5 rounded bg-slate-800 border border-slate-700">Copy</button>
-                    </div>
-                    <div id="sol-text-${ch.chapter}" class="text-xs text-slate-300 font-mono whitespace-pre-wrap leading-relaxed">${ch.solution}</div>
-                  </div>
-                </div>
-              ` : ''}
-            </div>
-          ` : ''}
-
-          <!-- Chapter Bottom Stepper Controls -->
-          <div class="flex items-center justify-between pt-4 border-t border-slate-800">
-            <button onclick="setModalChapter(${ch.chapter - 1})" ${ch.chapter === 1 ? 'disabled class="opacity-30 cursor-not-allowed px-3.5 py-1.5 rounded-lg text-xs bg-slate-800 text-slate-400"' : 'class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all flex items-center"'} >
-              <i class="fa-solid fa-arrow-left mr-1.5"></i>Previous Chapter (Ch ${ch.chapter - 1})
-            </button>
-            <div class="hidden sm:flex items-center space-x-1">
-              ${chapters.map(c => `
-                <button onclick="setModalChapter(${c.chapter})" class="w-6 h-6 rounded-full text-[10px] font-mono font-bold flex items-center justify-center transition-all ${c.chapter === ch.chapter ? 'bg-cyan-500 text-white shadow' : 'bg-slate-800 text-slate-400 hover:text-white'}">
-                  ${c.chapter}
-                </button>
-              `).join('')}
-            </div>
-            ${ch.chapter < totalChapters ? `
-              <button onclick="setModalChapter(${ch.chapter + 1})" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-cyan-600 hover:bg-cyan-500 text-white transition-all flex items-center shadow-md">
-                Next Chapter (Ch ${ch.chapter + 1})<i class="fa-solid fa-arrow-right ml-1.5"></i>
-              </button>
-            ` : `
-              <button onclick="document.getElementById('module-capstone-section').scrollIntoView({behavior: 'smooth'})" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all flex items-center shadow-md">
-                Take Knowledge Quiz<i class="fa-solid fa-arrow-down ml-1.5"></i>
-              </button>
-            `}
-          </div>
-        </div>
-      `;
-    } else {
-      // 'all' mode: render all 10 chapters sequentially
-      chapterBodyHTML = `
-        <div class="space-y-6">
-          ${chapters.map(ch => {
-            const hasSql = isSqlStatement(ch.solution);
-            return `
-              <div id="chapter-block-${ch.chapter}" class="space-y-4 bg-slate-950/80 p-5 rounded-2xl border border-slate-800 shadow-md">
-                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2.5">
-                  <span class="px-2.5 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800 text-[11px] font-semibold">
-                    ${ch.badge || `Chapter ${ch.chapter}`}
-                  </span>
-                  <span class="text-xs font-mono text-slate-400">Chapter ${ch.chapter} of ${totalChapters}</span>
-                </div>
-                <h4 class="text-base sm:text-lg font-bold text-white">${ch.title}</h4>
-                <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-cyan-200 leading-relaxed font-sans">
-                  ${ch.overview}
-                </div>
-                <div class="chapter-content text-xs sm:text-sm text-slate-200 leading-relaxed space-y-3 font-sans">
-                  ${formatChapterMarkdown(ch.content)}
-                </div>
-                ${ch.diagram ? `
-                  <div class="my-3">
-                    <pre class="bg-slate-950 p-3.5 rounded-xl border border-cyan-900/40 font-mono text-[11px] sm:text-xs text-cyan-300 overflow-x-auto shadow-inner leading-relaxed"><code>${ch.diagram}</code></pre>
-                  </div>
-                ` : ''}
-                ${ch.takeaways && ch.takeaways.length > 0 ? `
-                  <div class="bg-slate-900/70 p-3.5 rounded-xl border border-slate-800 space-y-1.5">
-                    <span class="text-[11px] font-bold text-cyan-400 uppercase tracking-wider flex items-center">
-                      <i class="fa-solid fa-key mr-1.5 text-cyan-400"></i>Key Rules & Invariants:
-                    </span>
-                    <ul class="list-disc list-inside space-y-1 text-xs text-slate-300">
-                      ${ch.takeaways.map(t => `<li class="leading-relaxed">${t}</li>`).join('')}
-                    </ul>
-                  </div>
-                ` : ''}
-                ${ch.exercise ? `
-                  <div class="p-4 rounded-xl bg-cyan-950/20 border border-cyan-800/40 space-y-2.5">
-                    <span class="text-xs font-bold text-cyan-400 flex items-center">
-                      <i class="fa-solid fa-laptop-code mr-1.5"></i>Chapter ${ch.chapter} Challenge
-                    </span>
-                    <div class="text-xs text-slate-200 font-sans">${formatChapterMarkdown(ch.exercise)}</div>
-                    ${ch.solution ? `
-                      <div class="pt-2 flex flex-col space-y-2">
-                        <div class="flex items-center space-x-2">
-                          <button onclick="toggleChapterSolution(${ch.chapter})" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[11px] font-semibold text-cyan-300 border border-slate-700">
-                            <span id="sol-btn-label-${ch.chapter}">Show Solution</span>
-                          </button>
-                          ${hasSql ? `
-                            <button onclick="runChapterSolutionInPlayground(${ch.chapter})" class="px-2.5 py-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white text-[11px] font-bold">
-                              Run in Playground
-                            </button>
-                          ` : ''}
-                        </div>
-                        <div id="sol-box-${ch.chapter}" class="hidden mt-2 p-3 rounded-lg bg-slate-950 border border-emerald-900/50 text-xs text-slate-300 font-mono whitespace-pre-wrap">
-                          ${ch.solution}
-                        </div>
-                      </div>
-                    ` : ''}
-                  </div>
-                ` : ''}
-              </div>
-            `;
-          }).join('')}
-        </div>
-      `;
-    }
-  } else {
-    // Fallback if no chapters property
-    let sectionsHTML = "";
-    if (lesson.sections && lesson.sections.length > 0) {
-      sectionsHTML = lesson.sections.map((s, sIdx) => `
-        <div class="space-y-3 bg-slate-950/70 p-5 rounded-xl border border-slate-800 shadow-md">
-          <h4 class="text-sm sm:text-base font-bold text-white flex items-center">
-            <i class="fa-solid fa-layer-group text-cyan-400 mr-2.5"></i>${s.heading}
-          </h4>
-          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">${s.content}</p>
-          ${s.diagram ? `
-            <pre class="bg-slate-950 p-4 rounded-xl border border-cyan-900/40 font-mono text-[11px] text-cyan-300 overflow-x-auto"><code>${s.diagram}</code></pre>
-          ` : ''}
-        </div>
-      `).join("");
-    }
-    chapterBodyHTML = sectionsHTML;
-  }
-
-  // 4. Multi-Cloud Real-World Case Study
-  let cloudHTML = "";
-  if (lesson.cloudCaseStudy) {
-    cloudHTML = `
-      <div class="bg-gradient-to-r from-slate-950 via-indigo-950/20 to-slate-950 p-5 rounded-xl border border-indigo-900/50 space-y-2.5">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center">
-            <i class="fa-solid fa-cloud mr-2"></i>Multi-Cloud Big Data Real-World Case Study
-          </span>
-          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">
-            ${lesson.cloudCaseStudy.table}
-          </span>
-        </div>
-        <h4 class="text-sm font-bold text-white">${lesson.cloudCaseStudy.title}</h4>
-        <div class="text-xs text-indigo-200/80 font-mono">Source: ${lesson.cloudCaseStudy.source}</div>
-        <p class="text-xs text-slate-300 leading-relaxed">${lesson.cloudCaseStudy.description}</p>
-      </div>
-    `;
-  }
-
-  // 5. Module Capstone Section (Cloud Study, Master Code, Pitfalls, Quiz)
-  let capstoneHTML = `
-    <div id="module-capstone-section" class="border-t border-slate-800 pt-6 space-y-6">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center">
-          <i class="fa-solid fa-trophy text-amber-400 mr-2"></i>Module Capstone & Production Practice
-        </h3>
-        <span class="text-xs text-slate-500 font-mono">Week ${weekNum} of 24</span>
-      </div>
-
-      <!-- Cloud Big Data Case Study -->
-      ${cloudHTML}
-
-      <!-- Executable Practical Code Block -->
-      <div class="space-y-3 bg-slate-950 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
-        <div class="bg-slate-800/90 px-4 py-3 flex flex-wrap items-center justify-between gap-2 border-b border-slate-700">
-          <span class="text-xs sm:text-sm font-bold text-cyan-300 flex items-center">
-            <i class="fa-solid fa-terminal mr-2 text-cyan-400"></i>${lesson.codeTitle}
-          </span>
-          <div class="flex items-center space-x-2">
-            <button onclick="navigator.clipboard.writeText(LESSON_DETAILS[${weekNum}].code); alert('SQL Query copied to clipboard!');" 
-              class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition-all flex items-center">
-              <i class="fa-regular fa-copy mr-1.5"></i>Copy SQL
-            </button>
-            <button onclick="runLessonCodeInPlayground(${weekNum})" class="px-3.5 py-1 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition-all flex items-center shadow-md">
-              <i class="fa-solid fa-play mr-1.5"></i>Run in SQL Playground
-            </button>
-          </div>
-        </div>
-        <pre class="p-4 font-mono text-xs text-cyan-200 overflow-x-auto bg-slate-950 leading-relaxed"><code>${lesson.code}</code></pre>
-        ${lesson.codeExplanation ? `
-          <div class="p-4 bg-slate-900/50 border-t border-slate-800/80 text-xs text-slate-300 leading-relaxed space-y-1">
-            <span class="font-bold text-cyan-400 flex items-center"><i class="fa-solid fa-code-compare mr-1.5"></i>Step-by-Step Query Breakdown:</span>
-            <p>${lesson.codeExplanation}</p>
+        ${lesson.cloudDataset ? `
+          <div class="px-2.5 py-1 rounded-full bg-cyan-950/90 text-cyan-300 border border-cyan-800 text-[11px] font-semibold flex items-center">
+            <i class="fa-solid fa-cloud-arrow-down mr-1.5 text-cyan-400"></i>${lesson.cloudDataset}
           </div>
         ` : ''}
       </div>
+      <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans">${lesson.overview}</p>
+    </div>
+  `;
 
-      <!-- Senior DBA Pitfalls & Production Advice -->
-      <div class="p-5 rounded-xl bg-amber-950/20 border border-amber-800/40 text-amber-200 text-xs space-y-2">
-        <div class="font-bold text-sm flex items-center"><i class="fa-solid fa-triangle-exclamation text-amber-400 mr-2"></i>Senior Staff DBA Pitfalls & Production Insights</div>
-        <div class="leading-relaxed text-slate-300 text-xs sm:text-sm">${lesson.pitfalls}</div>
+  // 3. Chapter Body Content
+  const contentHTML = `
+    <div class="space-y-5 bg-slate-950/80 p-5 sm:p-6 rounded-2xl border border-slate-800 shadow-xl">
+      <div class="chapter-content text-xs sm:text-sm text-slate-200 leading-relaxed space-y-3 font-sans">
+        ${formatChapterMarkdown(lesson.content)}
       </div>
 
-      <!-- Interactive Knowledge Check Quiz -->
-      <div class="p-5 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
-        <h4 class="text-xs font-bold text-white uppercase tracking-wider flex items-center">
-          <i class="fa-solid fa-circle-question text-cyan-400 mr-2"></i>Interactive Knowledge Check Quiz
-        </h4>
-        <p class="text-xs sm:text-sm text-slate-200 font-semibold">${lesson.quiz.question}</p>
-        <div class="space-y-2 pt-1" id="quiz-options-container">
-          ${lesson.quiz.options.map((opt, oIdx) => `
-            <button onclick="answerLessonQuiz(${weekNum}, ${oIdx})" id="quiz-opt-${oIdx}" 
-              class="w-full text-left p-3 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-300 hover:border-cyan-500 hover:text-white transition-all flex items-center justify-between">
-              <span class="pr-2">${opt}</span>
-              <span class="text-[10px] text-slate-500 font-mono shrink-0">Option ${oIdx + 1}</span>
-            </button>
-          `).join("")}
+      ${lesson.diagram ? `
+        <div class="my-4">
+          <div class="text-[11px] font-bold uppercase tracking-wider text-cyan-400 mb-1.5 flex items-center">
+            <i class="fa-solid fa-diagram-project mr-1.5"></i>Architecture & Data Flow Diagram
+          </div>
+          <pre class="bg-slate-950 p-4 rounded-xl border border-cyan-900/50 font-mono text-[11px] sm:text-xs text-cyan-300 overflow-x-auto shadow-inner leading-relaxed"><code>${lesson.diagram}</code></pre>
         </div>
-        <div id="quiz-feedback" class="hidden p-3 rounded-lg text-xs font-mono"></div>
+      ` : ''}
+
+      ${lesson.takeaways && lesson.takeaways.length > 0 ? `
+        <div class="my-4 space-y-2 bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+          <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center">
+            <i class="fa-solid fa-key mr-2 text-cyan-400"></i>Key Rules & Invariants:
+          </span>
+          <ul class="list-disc list-inside space-y-1.5 text-xs text-slate-300 pt-1">
+            ${lesson.takeaways.map(t => `<li class="leading-relaxed">${t}</li>`).join('')}
+          </ul>
+        </div>
+      ` : ''}
+
+      ${lesson.exercise ? `
+        <div class="my-4 p-5 rounded-xl bg-gradient-to-r from-cyan-950/30 via-slate-900 to-slate-950 border border-cyan-800/60 shadow-lg space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center">
+              <i class="fa-solid fa-laptop-code text-cyan-400 mr-2"></i>Chapter ${chapterNum} Hands-On Challenge
+            </span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">
+              Interactive Exercise
+            </span>
+          </div>
+          <div class="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans">
+            ${formatChapterMarkdown(lesson.exercise)}
+          </div>
+
+          <!-- Solution Accordion -->
+          ${lesson.solution ? `
+            <div class="pt-3 border-t border-slate-800 flex flex-col space-y-2">
+              <div class="flex flex-wrap items-center gap-2">
+                <button onclick="toggleChapterSolution(${chapterNum})" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-cyan-300 hover:text-white border border-slate-700 transition-all flex items-center space-x-1.5">
+                  <i class="fa-solid fa-lightbulb text-amber-400"></i>
+                  <span id="sol-btn-label-${chapterNum}">Show Solution & Code</span>
+                </button>
+                ${isSqlStatement(lesson.solution) ? `
+                  <button onclick="runChapterSolutionInPlayground(${chapterNum})" class="px-3.5 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition-all shadow-md flex items-center">
+                    <i class="fa-solid fa-play mr-1.5"></i>Run in SQL Playground
+                  </button>
+                ` : ''}
+              </div>
+              <div id="sol-box-${chapterNum}" class="hidden mt-2 p-4 rounded-xl bg-slate-950 border border-emerald-900/50 space-y-2">
+                <div class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider flex items-center justify-between">
+                  <span><i class="fa-solid fa-check-circle mr-1.5"></i>Solution & Explanation:</span>
+                  <button onclick="navigator.clipboard.writeText(document.getElementById('sol-text-${chapterNum}').innerText); alert('Solution copied to clipboard!');" class="text-slate-400 hover:text-white text-[10px] px-2 py-0.5 rounded bg-slate-800 border border-slate-700">Copy</button>
+                </div>
+                <div id="sol-text-${chapterNum}" class="text-xs text-slate-300 font-mono whitespace-pre-wrap leading-relaxed">${lesson.solution}</div>
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      ` : ''}
+
+      <!-- Bottom Stepper -->
+      <div class="flex items-center justify-between pt-4 border-t border-slate-800">
+        <button onclick="openLessonModal(${chapterNum - 1})" ${chapterNum === 1 ? 'disabled class="opacity-30 cursor-not-allowed px-3.5 py-1.5 rounded-lg text-xs bg-slate-800 text-slate-400"' : 'class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all flex items-center"'} >
+          <i class="fa-solid fa-arrow-left mr-1.5"></i>Previous Chapter (Ch ${chapterNum - 1})
+        </button>
+        <div class="hidden sm:flex items-center space-x-1">
+          ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(c => `
+            <button onclick="openLessonModal(${c})" class="w-6 h-6 rounded-full text-[10px] font-mono font-bold flex items-center justify-center transition-all ${c === chapterNum ? 'bg-cyan-500 text-white shadow' : 'bg-slate-800 text-slate-400 hover:text-white'}">
+              ${c}
+            </button>
+          `).join('')}
+        </div>
+        ${chapterNum < 10 ? `
+          <button onclick="openLessonModal(${chapterNum + 1})" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-cyan-600 hover:bg-cyan-500 text-white transition-all flex items-center shadow-md">
+            Next Chapter (Ch ${chapterNum + 1})<i class="fa-solid fa-arrow-right ml-1.5"></i>
+          </button>
+        ` : `
+          <button onclick="toggleChapterProgress(10); alert('Congratulations on completing all 10 Chapters of MySQL Pro!');" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all flex items-center shadow-md">
+            Finish Course<i class="fa-solid fa-graduation-cap ml-1.5"></i>
+          </button>
+        `}
       </div>
     </div>
   `;
 
+  // 4. Case Study, Practical Code Block, Pitfalls & Quiz
+  let capstoneHTML = "";
+  if (lesson.cloudCaseStudy || lesson.code || lesson.quiz) {
+    capstoneHTML = `
+      <div class="border-t border-slate-800 pt-6 space-y-6">
+        ${lesson.cloudCaseStudy ? `
+          <div class="bg-gradient-to-r from-slate-950 via-indigo-950/20 to-slate-950 p-5 rounded-xl border border-indigo-900/50 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center">
+                <i class="fa-solid fa-cloud mr-2"></i>Cloud Big Data Case Study
+              </span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">
+                ${lesson.cloudCaseStudy.table}
+              </span>
+            </div>
+            <h4 class="text-sm font-bold text-white">${lesson.cloudCaseStudy.title}</h4>
+            <div class="text-xs text-indigo-200/80 font-mono">Source: ${lesson.cloudCaseStudy.source}</div>
+            <p class="text-xs text-slate-300 leading-relaxed">${lesson.cloudCaseStudy.description}</p>
+          </div>
+        ` : ''}
+
+        ${lesson.code ? `
+          <div class="space-y-3 bg-slate-950 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
+            <div class="bg-slate-800/90 px-4 py-3 flex flex-wrap items-center justify-between gap-2 border-b border-slate-700">
+              <span class="text-xs sm:text-sm font-bold text-cyan-300 flex items-center">
+                <i class="fa-solid fa-terminal mr-2 text-cyan-400"></i>${lesson.codeTitle || 'Practical Production Query'}
+              </span>
+              <div class="flex items-center space-x-2">
+                <button onclick="navigator.clipboard.writeText(LESSON_DETAILS[${chapterNum}].code); alert('SQL Query copied to clipboard!');" 
+                  class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition-all flex items-center">
+                  <i class="fa-regular fa-copy mr-1.5"></i>Copy SQL
+                </button>
+                <button onclick="runLessonCodeInPlayground(${chapterNum})" class="px-3.5 py-1 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition-all flex items-center shadow-md">
+                  <i class="fa-solid fa-play mr-1.5"></i>Run in SQL Playground
+                </button>
+              </div>
+            </div>
+            <pre class="p-4 font-mono text-xs text-cyan-200 overflow-x-auto bg-slate-950 leading-relaxed"><code>${lesson.code}</code></pre>
+            ${lesson.codeExplanation ? `
+              <div class="p-4 bg-slate-900/50 border-t border-slate-800/80 text-xs text-slate-300 leading-relaxed space-y-1">
+                <span class="font-bold text-cyan-400 flex items-center"><i class="fa-solid fa-code-compare mr-1.5"></i>Step-by-Step Query Breakdown:</span>
+                <p>${lesson.codeExplanation}</p>
+              </div>
+            ` : ''}
+          </div>
+        ` : ''}
+
+        ${lesson.pitfalls ? `
+          <div class="p-5 rounded-xl bg-amber-950/20 border border-amber-800/40 text-amber-200 text-xs space-y-2">
+            <div class="font-bold text-sm flex items-center"><i class="fa-solid fa-triangle-exclamation text-amber-400 mr-2"></i>Senior Staff DBA Pitfalls & Production Insights</div>
+            <div class="leading-relaxed text-slate-300 text-xs sm:text-sm">${lesson.pitfalls}</div>
+          </div>
+        ` : ''}
+
+        ${lesson.quiz ? `
+          <div class="p-5 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
+            <h4 class="text-xs font-bold text-white uppercase tracking-wider flex items-center">
+              <i class="fa-solid fa-circle-question text-cyan-400 mr-2"></i>Interactive Knowledge Check Quiz
+            </h4>
+            <p class="text-xs sm:text-sm text-slate-200 font-semibold">${lesson.quiz.question}</p>
+            <div class="space-y-2 pt-1" id="quiz-options-container">
+              ${lesson.quiz.options.map((opt, oIdx) => `
+                <button onclick="answerLessonQuiz(${chapterNum}, ${oIdx})" id="quiz-opt-${oIdx}" 
+                  class="w-full text-left p-3 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-300 hover:border-cyan-500 hover:text-white transition-all flex items-center justify-between">
+                  <span class="pr-2">${opt}</span>
+                  <span class="text-[10px] text-slate-500 font-mono shrink-0">Option ${oIdx + 1}</span>
+                </button>
+              `).join("")}
+            </div>
+            <div id="quiz-feedback" class="hidden p-3 rounded-lg text-xs font-mono"></div>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
   body.innerHTML = `
+    ${pillsHTML}
     ${headerHTML}
-    ${chapterNavHTML}
-    ${chapterBodyHTML}
+    ${contentHTML}
     ${capstoneHTML}
   `;
+
+  // Update navigation buttons
+  document.getElementById('modal-prev-btn').disabled = (chapterNum === 1);
+  document.getElementById('modal-prev-btn').style.opacity = (chapterNum === 1) ? "0.4" : "1.0";
+  document.getElementById('modal-next-btn').disabled = (chapterNum === 10);
+  document.getElementById('modal-next-btn').style.opacity = (chapterNum === 10) ? "0.4" : "1.0";
+
+  updateModalCompleteBtnState();
+  modal.classList.remove('hidden');
+  body.scrollTop = 0;
 }
 
 function closeLessonModal() {
@@ -1175,44 +975,46 @@ function closeLessonModal() {
 }
 
 function prevLesson() {
-  if (activeModalWeek > 1) {
-    openLessonModal(activeModalWeek - 1);
+  if (activeModalChapter > 1) {
+    openLessonModal(activeModalChapter - 1);
   }
 }
 
 function nextLesson() {
-  if (activeModalWeek < 24) {
-    openLessonModal(activeModalWeek + 1);
+  if (activeModalChapter < 10) {
+    openLessonModal(activeModalChapter + 1);
   }
 }
 
 function updateModalCompleteBtnState() {
   const savedProgress = JSON.parse(localStorage.getItem('mysql_pro_progress') || '{}');
-  const isDone = !!savedProgress[`w_${activeModalWeek}`];
+  const isDone = !!savedProgress[`ch_${activeModalChapter}`];
   const btn = document.getElementById('modal-complete-btn');
+  if (!btn) return;
 
   if (isDone) {
     btn.className = "px-4 py-1.5 rounded-lg text-xs font-bold transition-all shadow-md bg-emerald-600 hover:bg-emerald-500 text-white flex items-center";
     btn.innerHTML = `<i class="fa-solid fa-circle-check mr-1.5"></i>Completed!`;
   } else {
     btn.className = "px-4 py-1.5 rounded-lg text-xs font-bold transition-all shadow-md bg-cyan-600 hover:bg-cyan-500 text-white flex items-center";
-    btn.innerHTML = `<i class="fa-solid fa-check mr-1.5"></i>Mark Week Completed`;
+    btn.innerHTML = `<i class="fa-solid fa-check mr-1.5"></i>Mark Chapter Completed`;
   }
 }
 
 function toggleCurrentModalComplete() {
-  toggleWeekProgress(activeModalWeek);
+  toggleChapterProgress(activeModalChapter);
 }
 
-function answerLessonQuiz(weekNum, selectedIdx) {
-  const lesson = LESSON_DETAILS[weekNum];
-  if (!lesson) return;
+function answerLessonQuiz(chapterNum, selectedIdx) {
+  const lesson = LESSON_DETAILS[chapterNum];
+  if (!lesson || !lesson.quiz) return;
 
   const feedback = document.getElementById('quiz-feedback');
   const isCorrect = (selectedIdx === lesson.quiz.answer);
 
   lesson.quiz.options.forEach((_, idx) => {
     const optBtn = document.getElementById(`quiz-opt-${idx}`);
+    if (!optBtn) return;
     if (idx === lesson.quiz.answer) {
       optBtn.className = "w-full text-left p-2.5 rounded-lg bg-emerald-950/80 border border-emerald-600 text-xs text-emerald-200 transition-all flex items-center justify-between";
     } else if (idx === selectedIdx) {
@@ -1230,8 +1032,8 @@ function answerLessonQuiz(weekNum, selectedIdx) {
   }
 }
 
-function runLessonCodeInPlayground(weekNum) {
-  const lesson = LESSON_DETAILS[weekNum];
+function runLessonCodeInPlayground(chapterNum) {
+  const lesson = LESSON_DETAILS[chapterNum];
   if (!lesson) return;
 
   document.getElementById('sql-editor').value = lesson.code;

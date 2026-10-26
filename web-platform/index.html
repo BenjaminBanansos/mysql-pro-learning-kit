@@ -101,19 +101,19 @@
       <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-slate-800 p-8 shadow-2xl">
         <div class="relative z-10 max-w-3xl space-y-4">
           <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold">
-            <i class="fa-solid fa-rocket"></i>
-            <span>From Intermediate Developer to Staff Database Architect</span>
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span>Complete 10-Chapter Masterclass: From Zero to Cloud Data Architect</span>
           </div>
           <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
-            6-Month MySQL Enterprise Mastery Syllabus
+            10-Chapter MySQL & Cloud Big Data Mastery
           </h1>
           <p class="text-slate-300 text-base leading-relaxed">
-            Master storage engine internals (InnoDB), B+ Tree indexing, ACID concurrency, deadlocks, partition pruning, and cloud read/write splitting using real-world datasets from the <strong>AWS Open Data Registry</strong> (NYC TLC Taxi, Amazon Reviews, Aviation) with millions of records.
+            Designed for learners with <strong>zero prior SQL background</strong>. Learn to connect and fetch data from real-world cloud big data containers (<strong>AWS S3 Open Data</strong>, <strong>Google Cloud BigQuery</strong>, and <strong>Hugging Face Hub</strong>), design schemas, ingest millions of records, and master relational querying with hands-on exercises.
           </p>
           <div class="pt-2 flex flex-wrap gap-4 text-sm text-slate-400">
-            <div class="flex items-center"><i class="fa-solid fa-clock text-cyan-400 mr-2"></i>24 Weeks / 6 Months</div>
-            <div class="flex items-center"><i class="fa-brands fa-aws text-cyan-400 mr-2"></i>AWS Open Data Registry</div>
-            <div class="flex items-center"><i class="fa-solid fa-certificate text-cyan-400 mr-2"></i>3 Production Portfolio Capstones</div>
+            <div class="flex items-center"><i class="fa-solid fa-layer-group text-cyan-400 mr-2"></i>10 Core Master Chapters</div>
+            <div class="flex items-center"><i class="fa-brands fa-aws text-cyan-400 mr-2"></i>AWS S3, GCP & Hugging Face Containers</div>
+            <div class="flex items-center"><i class="fa-solid fa-terminal text-cyan-400 mr-2"></i>Interactive SQL Playground</div>
           </div>
           <div class="pt-3 flex flex-wrap gap-3">
             <a href="MySQL_Pro_Learning_And_Testing_Kit.pdf" download="MySQL_Pro_Learning_And_Testing_Kit.pdf" class="inline-flex items-center px-4 py-2 rounded-xl text-sm font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition-all shadow-lg shadow-emerald-500/20">
@@ -133,7 +133,7 @@
       <div class="bg-slate-900 p-5 rounded-xl border border-slate-800 space-y-2">
         <div class="flex justify-between items-center text-sm">
           <span class="font-semibold text-slate-200"><i class="fa-solid fa-list-check text-cyan-400 mr-2"></i>Curriculum Completion Track</span>
-          <span id="tracker-status" class="text-cyan-400 font-bold">0 / 24 Weeks Completed</span>
+          <span id="tracker-status" class="text-cyan-400 font-bold">0 / 10 Chapters Completed</span>
         </div>
         <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
           <div id="tracker-bar" class="bg-gradient-to-r from-cyan-500 to-blue-500 h-full w-0 transition-all duration-500"></div>
@@ -154,11 +154,11 @@
         <!-- Modal Header -->
         <div class="bg-slate-800/95 px-5 py-3.5 border-b border-slate-700 flex flex-wrap items-center justify-between gap-3 sticky top-0 z-10">
           <div class="flex items-center space-x-3 overflow-hidden">
-            <span id="modal-month-badge" class="px-2.5 py-1 text-xs font-bold rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800 shrink-0">Month 1 • Week 1</span>
-            <h2 id="modal-lesson-title" class="text-base sm:text-lg font-bold text-white truncate max-w-md">Logical Query Execution Order</h2>
+            <span id="modal-month-badge" class="px-2.5 py-1 text-xs font-bold rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800 shrink-0">Chapter 1 of 10</span>
+            <h2 id="modal-lesson-title" class="text-base sm:text-lg font-bold text-white truncate max-w-md">Zero-to-One Foundations</h2>
           </div>
           <div class="flex items-center space-x-2 shrink-0">
-            <!-- Jump to Week Dropdown -->
+            <!-- Jump to Chapter Dropdown -->
             <select id="modal-week-selector" onchange="openLessonModal(parseInt(this.value))" class="bg-slate-900 border border-slate-700 text-xs text-slate-200 rounded-lg px-2.5 py-1.5 focus:ring-1 focus:ring-cyan-500 cursor-pointer">
               <!-- Injected via JS -->
             </select>
@@ -176,13 +176,13 @@
         <!-- Modal Footer (Navigation & Mark Complete) -->
         <div class="bg-slate-800/95 px-6 py-3.5 border-t border-slate-700 flex items-center justify-between">
           <button id="modal-prev-btn" onclick="prevLesson()" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors flex items-center">
-            <i class="fa-solid fa-arrow-left mr-1.5"></i>Previous Week
+            <i class="fa-solid fa-arrow-left mr-1.5"></i>Previous Chapter
           </button>
           <button id="modal-complete-btn" onclick="toggleCurrentModalComplete()" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all shadow-md flex items-center">
-            <i class="fa-solid fa-check mr-1.5"></i>Mark Week Completed
+            <i class="fa-solid fa-check mr-1.5"></i>Mark Chapter Completed
           </button>
           <button id="modal-next-btn" onclick="nextLesson()" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors flex items-center">
-            Next Week<i class="fa-solid fa-arrow-right ml-1.5"></i>
+            Next Chapter<i class="fa-solid fa-arrow-right ml-1.5"></i>
           </button>
         </div>
       </div>

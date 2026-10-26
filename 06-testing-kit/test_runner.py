@@ -335,11 +335,11 @@ class TestSuiteRunner:
         except Exception as e:
             self.log_result("Zero-Negative-Balance Integrity", False, str(e))
 
-    def test_comprehensive_course_lessons(self):
+    def test_ten_chapter_course_structure(self):
         try:
             lessons_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "web-platform", "lessons-data.js")
             if not os.path.exists(lessons_file):
-                self.log_result("Comprehensive Course Lessons (24 Weeks)", False, "lessons-data.js not found!")
+                self.log_result("10-Chapter Masterclass Structure", False, "lessons-data.js not found!")
                 return
 
             with open(lessons_file, "r") as f:
@@ -350,21 +350,22 @@ class TestSuiteRunner:
             e_idx = content.rfind("}") + 1
             data = json.loads(content[s_idx:e_idx])
 
-            total_weeks = len(data)
-            has_all_24 = total_weeks == 24
-            has_quizzes = all("quiz" in w and "question" in w["quiz"] for w in data.values())
-            has_code = all("code" in w and len(w["code"]) > 20 for w in data.values())
-            passed = has_all_24 and has_quizzes and has_code
+            total_chapters = len(data)
+            has_10_chapters = (total_chapters == 10)
+            has_quizzes = all("quiz" in ch and "question" in ch["quiz"] for ch in data.values())
+            has_code = all("code" in ch and len(ch["code"]) > 10 for ch in data.values())
+            has_diagrams = all("diagram" in ch and len(ch["diagram"]) > 20 for ch in data.values())
+            passed = has_10_chapters and has_quizzes and has_code and has_diagrams
 
             self.log_result(
-                "Comprehensive Course Lessons Verification (24 Full Weeks)",
+                "10-Chapter Masterclass Course Structure",
                 passed,
-                f"All 24 weeks verified with full textbook theory, diagrams, SQL code, and quizzes."
+                f"Exactly 10 comprehensive chapters verified with full theory, diagrams, SQL code, and quizzes."
             )
         except Exception as e:
-            self.log_result("Comprehensive Course Lessons Verification", False, str(e))
+            self.log_result("10-Chapter Masterclass Course Structure", False, str(e))
 
-    def test_ten_chapters_per_lesson(self):
+    def test_cloud_containers_and_exercises(self):
         try:
             lessons_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "web-platform", "lessons-data.js")
             with open(lessons_file, "r") as f:
@@ -375,23 +376,23 @@ class TestSuiteRunner:
             e_idx = content.rfind("}") + 1
             data = json.loads(content[s_idx:e_idx])
 
-            total_weeks = len(data)
-            all_have_10_chapters = all(
-                "chapters" in w and len(w["chapters"]) >= 10 for w in data.values()
-            )
             all_have_exercises = all(
-                all("exercise" in ch and "solution" in ch for ch in w["chapters"])
-                for w in data.values()
+                "exercise" in ch and "solution" in ch and len(ch["exercise"]) > 10
+                for ch in data.values()
             )
-            passed = (total_weeks == 24) and all_have_10_chapters and all_have_exercises
+            covers_aws = any("AWS" in ch.get("cloudDataset", "") or "AWS" in ch.get("content", "") for ch in data.values())
+            covers_gcp = any("BigQuery" in ch.get("cloudDataset", "") or "Google" in ch.get("content", "") for ch in data.values())
+            covers_hf = any("Hugging Face" in ch.get("cloudDataset", "") or "FineWeb" in ch.get("content", "") for ch in data.values())
+
+            passed = all_have_exercises and covers_aws and covers_gcp and covers_hf
 
             self.log_result(
-                "10-Chapter Masterclass Verification (Zero-Knowledge Course)",
+                "Cloud Big Data Containers & Guided Exercises",
                 passed,
-                f"All 24 weeks verified with >=10 chapters each (240+ total chapters with exercises & solutions)."
+                f"10/10 chapters verified with hands-on challenges and cloud container coverage (AWS S3, GCP, Hugging Face)."
             )
         except Exception as e:
-            self.log_result("10-Chapter Masterclass Verification", False, str(e))
+            self.log_result("Cloud Big Data Containers & Guided Exercises", False, str(e))
 
     def run_all(self):
         print_header("MYSQL PRO TEST RUNNER: EXECUTING UNIT & INTEGRATION TESTS")
@@ -405,8 +406,8 @@ class TestSuiteRunner:
         self.test_self_join_tag_cooccurrence()
         self.test_financial_ledger_conservation()
         self.test_negative_balance_check_constraint()
-        self.test_comprehensive_course_lessons()
-        self.test_ten_chapters_per_lesson()
+        self.test_ten_chapter_course_structure()
+        self.test_cloud_containers_and_exercises()
 
         elapsed = time.time() - start
         total = self.tests_passed + self.tests_failed
