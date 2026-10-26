@@ -28,5 +28,5 @@
       ]
     }
   },
-  "postCreateCommand": "docker compose up -d && python3 01-datasets/cloud_public_datasets_connector.py --list"
+  "postCreateCommand": "bash .devcontainer/setup.sh"
 }
