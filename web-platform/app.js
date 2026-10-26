@@ -615,7 +615,7 @@ function renderCurriculum() {
                   <button onclick="openLessonModal(${w.week})" class="px-3 py-1 rounded-lg bg-cyan-600/20 hover:bg-cyan-600 text-cyan-300 hover:text-white text-xs font-semibold border border-cyan-500/30 transition-all flex items-center shadow-sm">
                     <i class="fa-solid fa-book-open mr-1.5"></i>Start Course Lesson
                   </button>
-                  <span class="text-[10px] text-slate-500 font-mono">~25-30 min</span>
+                  <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800 flex items-center"><i class="fa-solid fa-layer-group mr-1 text-cyan-400"></i>10 Chapters</span>
                 </div>
               </div>
             `;
@@ -647,8 +647,11 @@ function updateProgressStats() {
 }
 
 // ------------------------------------------------------------------------
-// 9. Lesson Course Player Modal Controls
+// 9. Lesson Course Player Modal Controls (10 Chapters per Lesson)
 // ------------------------------------------------------------------------
+let activeModalChapter = 1;
+let modalViewMode = 'single'; // 'single' or 'all'
+
 function initModalWeekSelector() {
   const sel = document.getElementById('modal-week-selector');
   if (!sel || sel.children.length > 0) return;
@@ -661,8 +664,110 @@ function initModalWeekSelector() {
   }
 }
 
-function openLessonModal(weekNum) {
+function formatChapterMarkdown(md) {
+  if (!md) return '';
+  let s = md
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  // Code blocks: ```(lang)?
+([\s\S]*?)```
+  s = s.replace(/```([a-zA-Z0-9_\-]*)?\n([\s\S]*?)```/g, (match, lang, code) => {
+    const l = lang ? lang.toUpperCase() : 'CODE';
+    return `<div class="my-3 rounded-xl overflow-hidden border border-slate-700 bg-slate-950 shadow-md">
+      <div class="bg-slate-800/80 px-3.5 py-1.5 border-b border-slate-700 flex items-center justify-between text-[11px] font-mono text-cyan-400">
+        <span><i class="fa-solid fa-code mr-1.5"></i>${l}</span>
+        <button onclick="navigator.clipboard.writeText(this.closest('.my-3').querySelector('code').innerText); alert('Code snippet copied!');" class="text-slate-400 hover:text-white text-[10px] px-2 py-0.5 rounded bg-slate-700/50 hover:bg-slate-700 transition-colors">Copy</button>
+      </div>
+      <pre class="p-3.5 text-xs font-mono text-cyan-200 overflow-x-auto leading-relaxed whitespace-pre"><code>${code.trim()}</code></pre>
+    </div>`;
+  });
+
+  // Inline code: `code`
+  s = s.replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 rounded bg-slate-800 text-cyan-300 font-mono text-[11px] border border-slate-700">$1</code>');
+
+  // Headings
+  s = s.replace(/^### (.*$)/gim, '<h4 class="text-sm font-bold text-cyan-300 mt-4 mb-2 flex items-center"><i class="fa-solid fa-angle-right mr-1.5 text-cyan-400 text-xs"></i>$1</h4>');
+  s = s.replace(/^## (.*$)/gim, '<h3 class="text-base font-bold text-white mt-5 mb-2">$1</h3>');
+  s = s.replace(/^# (.*$)/gim, '<h2 class="text-lg font-extrabold text-white mt-6 mb-3">$1</h2>');
+
+  // Bold & Italic
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-white font-semibold">$1</strong>');
+  s = s.replace(/\*([^*]+)\*/g, '<em class="text-slate-200">$1</em>');
+
+  // Lists
+  s = s.replace(/^- (.*$)/gim, '<li class="ml-4 list-disc text-slate-300 text-xs leading-relaxed my-1">$1</li>');
+  s = s.replace(/^(\d+)\. (.*$)/gim, '<li class="ml-4 list-decimal text-slate-300 text-xs leading-relaxed my-1">$2</li>');
+
+  // Paragraphs
+  const blocks = s.split(/\n\s*\n/);
+  return blocks.map(b => {
+    b = b.trim();
+    if (!b) return '';
+    if (b.startsWith('<div') || b.startsWith('<h') || b.startsWith('<li') || b.startsWith('<pre')) {
+      return b;
+    }
+    return `<p class="text-xs sm:text-sm text-slate-300 leading-relaxed my-2">${b.replace(/\n/g, '<br/>')}</p>`;
+  }).join('\n');
+}
+
+function isSqlStatement(text) {
+  if (!text) return false;
+  const upper = text.toUpperCase();
+  return ['SELECT', 'CREATE TABLE', 'INSERT INTO', 'LOAD DATA', 'WITH', 'ALTER TABLE', 'SHOW', 'EXPLAIN'].some(k => upper.includes(k));
+}
+
+function runQueryInPlayground(query) {
+  if (!query) return;
+  const editor = document.getElementById('sql-editor');
+  if (editor) editor.value = query.trim();
+  closeLessonModal();
+  switchTab('playground');
+  executeSQLQuery();
+}
+
+function runChapterSolutionInPlayground(chNum) {
+  const lesson = LESSON_DETAILS[activeModalWeek];
+  if (!lesson || !lesson.chapters) return;
+  const ch = lesson.chapters.find(c => c.chapter === chNum);
+  if (!ch || !ch.solution) return;
+  runQueryInPlayground(ch.solution);
+}
+
+function toggleChapterSolution(chNum) {
+  const box = document.getElementById(`sol-box-${chNum}`);
+  const label = document.getElementById(`sol-btn-label-${chNum}`);
+  if (!box) return;
+  const isHidden = box.classList.contains('hidden');
+  if (isHidden) {
+    box.classList.remove('hidden');
+    if (label) label.innerText = "Hide Solution";
+  } else {
+    box.classList.add('hidden');
+    if (label) label.innerText = "Show Solution & Code";
+  }
+}
+
+function setModalChapter(chNum) {
+  activeModalChapter = chNum;
+  renderLessonModalBody(activeModalWeek);
+  const body = document.getElementById('modal-lesson-body');
+  if (body) body.scrollTop = 0;
+}
+
+function toggleModalViewMode() {
+  modalViewMode = (modalViewMode === 'single') ? 'all' : 'single';
+  renderLessonModalBody(activeModalWeek);
+}
+
+function openLessonModal(weekNum, chapterNum) {
   activeModalWeek = weekNum;
+  if (chapterNum !== undefined) {
+    activeModalChapter = chapterNum;
+  } else if (!activeModalChapter || activeModalChapter < 1 || activeModalChapter > 10) {
+    activeModalChapter = 1;
+  }
   const lesson = LESSON_DETAILS[weekNum];
   if (!lesson) return;
 
@@ -674,51 +779,306 @@ function openLessonModal(weekNum) {
   document.getElementById('modal-month-badge').innerText = `Month ${lesson.month} • Week ${weekNum}`;
   document.getElementById('modal-lesson-title').innerText = lesson.title;
 
-  // Build Sections HTML
-  let sectionsHTML = "";
-  if (lesson.sections && lesson.sections.length > 0) {
-    sectionsHTML = lesson.sections.map((s, sIdx) => `
-      <div class="space-y-3 bg-slate-950/70 p-5 rounded-xl border border-slate-800 shadow-md">
-        <h4 class="text-sm sm:text-base font-bold text-white flex items-center">
-          <i class="fa-solid fa-layer-group text-cyan-400 mr-2.5"></i>${s.heading}
-        </h4>
-        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">${s.content}</p>
-        
-        ${s.diagram ? `
-          <div class="my-3">
-            <div class="text-[10px] font-bold uppercase tracking-wider text-cyan-500 mb-1 flex items-center">
-              <i class="fa-solid fa-diagram-project mr-1.5"></i>Architecture & Internal Layout Diagram
-            </div>
-            <pre class="bg-slate-950 p-4 rounded-xl border border-cyan-900/40 font-mono text-[11px] sm:text-xs text-cyan-300 overflow-x-auto shadow-inner leading-snug"><code>${s.diagram}</code></pre>
-          </div>
-        ` : ''}
+  renderLessonModalBody(weekNum);
 
-        ${s.takeaways && s.takeaways.length > 0 ? `
-          <div class="space-y-1.5 mt-3 bg-slate-900/80 p-3.5 rounded-lg border border-slate-800">
-            <span class="text-[11px] font-bold text-cyan-400 uppercase tracking-wider flex items-center">
-              <i class="fa-solid fa-key mr-1.5 text-cyan-400"></i>Key Production Rules & Invariants:
+  // Update navigation buttons
+  document.getElementById('modal-prev-btn').disabled = (weekNum === 1);
+  document.getElementById('modal-prev-btn').style.opacity = (weekNum === 1) ? "0.4" : "1.0";
+  document.getElementById('modal-next-btn').disabled = (weekNum === 24);
+  document.getElementById('modal-next-btn').style.opacity = (weekNum === 24) ? "0.4" : "1.0";
+
+  updateModalCompleteBtnState();
+  modal.classList.remove('hidden');
+}
+
+function renderLessonModalBody(weekNum) {
+  const lesson = LESSON_DETAILS[weekNum];
+  if (!lesson) return;
+  const body = document.getElementById('modal-lesson-body');
+  if (!body) return;
+
+  const chapters = lesson.chapters || [];
+  const totalChapters = chapters.length;
+
+  // 1. Header Card with Reading Time, Cloud Container, Chapters count & Mode Switcher
+  let headerHTML = `
+    <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3 shadow-lg">
+      <div class="flex flex-wrap items-center justify-between gap-2.5 text-xs">
+        <div class="flex items-center space-x-2 text-cyan-400 font-semibold">
+          <i class="fa-solid fa-clock"></i>
+          <span>Study Duration: ${lesson.time || '60 min deep study'}</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          ${lesson.cloudDataset ? `
+            <div class="px-2.5 py-1 rounded-full bg-cyan-950/90 text-cyan-300 border border-cyan-800 text-[11px] font-semibold flex items-center">
+              <i class="fa-solid fa-cloud-arrow-down mr-1.5 text-cyan-400"></i>${lesson.cloudDataset.split('(')[0].trim()}
+            </div>
+          ` : ''}
+          ${totalChapters > 0 ? `
+            <span class="px-2.5 py-1 rounded-full bg-blue-950/90 text-blue-300 border border-blue-800 text-[11px] font-bold flex items-center">
+              <i class="fa-solid fa-layer-group mr-1.5 text-blue-400"></i>${totalChapters} Chapters
             </span>
-            <ul class="list-disc list-inside space-y-1 text-xs text-slate-300 pt-1">
-              ${s.takeaways.map(t => `<li class="leading-relaxed">${t}</li>`).join('')}
-            </ul>
-          </div>
-        ` : ''}
+          ` : ''}
+        </div>
       </div>
-    `).join("");
-  } else if (lesson.theory) {
-    sectionsHTML = `
-      <div class="space-y-3 bg-slate-950/60 p-5 rounded-xl border border-slate-800">
-        <h3 class="text-base font-bold text-white flex items-center">
-          <i class="fa-solid fa-graduation-cap text-cyan-400 mr-2"></i>Core Theory & Architecture Breakdown
-        </h3>
-        <div class="text-xs sm:text-sm text-slate-300 leading-relaxed space-y-3">
-          ${lesson.theory}
+      <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans">${lesson.overview}</p>
+      
+      ${totalChapters > 0 ? `
+        <div class="pt-2 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2">
+          <span class="text-[11px] text-slate-400 flex items-center">
+            <i class="fa-solid fa-circle-info text-cyan-400 mr-1.5"></i>
+            Zero-knowledge friendly: every chapter includes guided theory, architecture diagrams & exercises.
+          </span>
+          <button onclick="toggleModalViewMode()" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all flex items-center space-x-1.5">
+            <i class="fa-solid ${modalViewMode === 'single' ? 'fa-book-open text-cyan-400' : 'fa-list-check text-blue-400'}"></i>
+            <span>${modalViewMode === 'single' ? 'View All 10 Chapters' : 'Chapter-by-Chapter Stepper'}</span>
+          </button>
+        </div>
+      ` : ''}
+    </div>
+  `;
+
+  // 2. Chapters Navigation Pills Bar (if chapters exist)
+  let chapterNavHTML = "";
+  if (totalChapters > 0) {
+    chapterNavHTML = `
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider">
+          <span class="flex items-center">
+            <i class="fa-solid fa-bookmark text-cyan-400 mr-2"></i>Curriculum Chapters
+          </span>
+          <span class="text-[11px] font-mono text-cyan-400">
+            ${modalViewMode === 'single' ? `Viewing Chapter ${activeModalChapter} of ${totalChapters}` : `All ${totalChapters} Chapters Expanded`}
+          </span>
+        </div>
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-thin">
+          ${chapters.map(ch => {
+            const isActive = (modalViewMode === 'single' && ch.chapter === activeModalChapter);
+            const shortTitle = ch.title.replace(/^Chapter \d+:\s*/, '');
+            return `
+              <button onclick="if(modalViewMode==='all'){modalViewMode='single';} setModalChapter(${ch.chapter});" 
+                class="px-3 py-1.5 rounded-lg text-xs whitespace-nowrap transition-all flex items-center space-x-1.5 shrink-0 ${
+                  isActive 
+                    ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold shadow-md shadow-cyan-950 border border-cyan-400' 
+                    : 'bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-slate-800'
+                }">
+                <span class="font-mono text-[10px] px-1.5 py-0.2 rounded ${isActive ? 'bg-white/20' : 'bg-slate-800'}">Ch ${ch.chapter}</span>
+                <span class="truncate max-w-[140px] sm:max-w-[180px]">${shortTitle}</span>
+              </button>
+            `;
+          }).join('')}
         </div>
       </div>
     `;
   }
 
-  // Build Cloud Case Study HTML
+  // 3. Chapter Content Section
+  let chapterBodyHTML = "";
+  if (totalChapters > 0) {
+    if (modalViewMode === 'single') {
+      const ch = chapters.find(c => c.chapter === activeModalChapter) || chapters[0];
+      const hasSql = isSqlStatement(ch.solution);
+      chapterBodyHTML = `
+        <div class="space-y-5 bg-slate-950/80 p-5 sm:p-6 rounded-2xl border border-slate-800 shadow-xl">
+          <!-- Chapter Header -->
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+            <span class="px-2.5 py-1 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800 text-xs font-semibold flex items-center">
+              <i class="fa-solid fa-graduation-cap text-cyan-400 mr-1.5"></i>${ch.badge || 'Core Fundamental'}
+            </span>
+            <span class="text-xs font-mono text-slate-400 flex items-center">
+              <i class="fa-solid fa-book-reader mr-1.5 text-cyan-400"></i>Chapter ${ch.chapter} of ${totalChapters} (${Math.round((ch.chapter / totalChapters) * 100)}%)
+            </span>
+          </div>
+
+          <h3 class="text-lg sm:text-xl font-bold text-white flex items-center">
+            ${ch.title}
+          </h3>
+
+          <!-- Chapter Overview -->
+          <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 text-xs sm:text-sm text-cyan-200/90 leading-relaxed font-sans shadow-inner">
+            <span class="font-bold text-cyan-400 block mb-1 uppercase tracking-wider text-[11px]"><i class="fa-solid fa-compass mr-1.5"></i>Chapter Overview:</span>
+            ${ch.overview}
+          </div>
+
+          <!-- Chapter Detailed Content -->
+          <div class="chapter-content text-xs sm:text-sm text-slate-200 leading-relaxed space-y-3 font-sans">
+            ${formatChapterMarkdown(ch.content)}
+          </div>
+
+          <!-- Architecture & Data Flow Diagram -->
+          ${ch.diagram ? `
+            <div class="my-4">
+              <div class="text-[11px] font-bold uppercase tracking-wider text-cyan-400 mb-1.5 flex items-center">
+                <i class="fa-solid fa-diagram-project mr-1.5"></i>Architecture & Data Flow Diagram
+              </div>
+              <pre class="bg-slate-950 p-4 rounded-xl border border-cyan-900/50 font-mono text-[11px] sm:text-xs text-cyan-300 overflow-x-auto shadow-inner leading-relaxed"><code>${ch.diagram}</code></pre>
+            </div>
+          ` : ''}
+
+          <!-- Key Takeaways / Production Rules -->
+          ${ch.takeaways && ch.takeaways.length > 0 ? `
+            <div class="my-4 space-y-2 bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+              <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center">
+                <i class="fa-solid fa-key mr-2 text-cyan-400"></i>Key Rules & Beginner Invariants:
+              </span>
+              <ul class="list-disc list-inside space-y-1.5 text-xs text-slate-300 pt-1">
+                ${ch.takeaways.map(t => `<li class="leading-relaxed">${t}</li>`).join('')}
+              </ul>
+            </div>
+          ` : ''}
+
+          <!-- Hands-On Challenge & Guided Exercise -->
+          ${ch.exercise ? `
+            <div class="my-4 p-5 rounded-xl bg-gradient-to-r from-cyan-950/30 via-slate-900 to-slate-950 border border-cyan-800/60 shadow-lg space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center">
+                  <i class="fa-solid fa-laptop-code text-cyan-400 mr-2"></i>Chapter ${ch.chapter} Hands-On Challenge
+                </span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">
+                  Guided Exercise
+                </span>
+              </div>
+              <div class="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans">
+                ${formatChapterMarkdown(ch.exercise)}
+              </div>
+
+              <!-- Solution Reveal Accordion -->
+              ${ch.solution ? `
+                <div class="pt-3 border-t border-slate-800 flex flex-col space-y-2">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="toggleChapterSolution(${ch.chapter})" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-cyan-300 hover:text-white border border-slate-700 transition-all flex items-center space-x-1.5">
+                      <i class="fa-solid fa-lightbulb text-amber-400"></i>
+                      <span id="sol-btn-label-${ch.chapter}">Show Solution & Code</span>
+                    </button>
+                    ${hasSql ? `
+                      <button onclick="runChapterSolutionInPlayground(${ch.chapter})" class="px-3.5 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition-all shadow-md flex items-center">
+                        <i class="fa-solid fa-play mr-1.5"></i>Run in SQL Playground
+                      </button>
+                    ` : ''}
+                  </div>
+                  <div id="sol-box-${ch.chapter}" class="hidden mt-2 p-4 rounded-xl bg-slate-950 border border-emerald-900/50 space-y-2">
+                    <div class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider flex items-center justify-between">
+                      <span><i class="fa-solid fa-check-circle mr-1.5"></i>Solution & Explanation:</span>
+                      <button onclick="navigator.clipboard.writeText(document.getElementById('sol-text-${ch.chapter}').innerText); alert('Solution copied to clipboard!');" class="text-slate-400 hover:text-white text-[10px] px-2 py-0.5 rounded bg-slate-800 border border-slate-700">Copy</button>
+                    </div>
+                    <div id="sol-text-${ch.chapter}" class="text-xs text-slate-300 font-mono whitespace-pre-wrap leading-relaxed">${ch.solution}</div>
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+          ` : ''}
+
+          <!-- Chapter Bottom Stepper Controls -->
+          <div class="flex items-center justify-between pt-4 border-t border-slate-800">
+            <button onclick="setModalChapter(${ch.chapter - 1})" ${ch.chapter === 1 ? 'disabled class="opacity-30 cursor-not-allowed px-3.5 py-1.5 rounded-lg text-xs bg-slate-800 text-slate-400"' : 'class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all flex items-center"'} >
+              <i class="fa-solid fa-arrow-left mr-1.5"></i>Previous Chapter (Ch ${ch.chapter - 1})
+            </button>
+            <div class="hidden sm:flex items-center space-x-1">
+              ${chapters.map(c => `
+                <button onclick="setModalChapter(${c.chapter})" class="w-6 h-6 rounded-full text-[10px] font-mono font-bold flex items-center justify-center transition-all ${c.chapter === ch.chapter ? 'bg-cyan-500 text-white shadow' : 'bg-slate-800 text-slate-400 hover:text-white'}">
+                  ${c.chapter}
+                </button>
+              `).join('')}
+            </div>
+            ${ch.chapter < totalChapters ? `
+              <button onclick="setModalChapter(${ch.chapter + 1})" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-cyan-600 hover:bg-cyan-500 text-white transition-all flex items-center shadow-md">
+                Next Chapter (Ch ${ch.chapter + 1})<i class="fa-solid fa-arrow-right ml-1.5"></i>
+              </button>
+            ` : `
+              <button onclick="document.getElementById('module-capstone-section').scrollIntoView({behavior: 'smooth'})" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all flex items-center shadow-md">
+                Take Knowledge Quiz<i class="fa-solid fa-arrow-down ml-1.5"></i>
+              </button>
+            `}
+          </div>
+        </div>
+      `;
+    } else {
+      // 'all' mode: render all 10 chapters sequentially
+      chapterBodyHTML = `
+        <div class="space-y-6">
+          ${chapters.map(ch => {
+            const hasSql = isSqlStatement(ch.solution);
+            return `
+              <div id="chapter-block-${ch.chapter}" class="space-y-4 bg-slate-950/80 p-5 rounded-2xl border border-slate-800 shadow-md">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2.5">
+                  <span class="px-2.5 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800 text-[11px] font-semibold">
+                    ${ch.badge || `Chapter ${ch.chapter}`}
+                  </span>
+                  <span class="text-xs font-mono text-slate-400">Chapter ${ch.chapter} of ${totalChapters}</span>
+                </div>
+                <h4 class="text-base sm:text-lg font-bold text-white">${ch.title}</h4>
+                <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-cyan-200 leading-relaxed font-sans">
+                  ${ch.overview}
+                </div>
+                <div class="chapter-content text-xs sm:text-sm text-slate-200 leading-relaxed space-y-3 font-sans">
+                  ${formatChapterMarkdown(ch.content)}
+                </div>
+                ${ch.diagram ? `
+                  <div class="my-3">
+                    <pre class="bg-slate-950 p-3.5 rounded-xl border border-cyan-900/40 font-mono text-[11px] sm:text-xs text-cyan-300 overflow-x-auto shadow-inner leading-relaxed"><code>${ch.diagram}</code></pre>
+                  </div>
+                ` : ''}
+                ${ch.takeaways && ch.takeaways.length > 0 ? `
+                  <div class="bg-slate-900/70 p-3.5 rounded-xl border border-slate-800 space-y-1.5">
+                    <span class="text-[11px] font-bold text-cyan-400 uppercase tracking-wider flex items-center">
+                      <i class="fa-solid fa-key mr-1.5 text-cyan-400"></i>Key Rules & Invariants:
+                    </span>
+                    <ul class="list-disc list-inside space-y-1 text-xs text-slate-300">
+                      ${ch.takeaways.map(t => `<li class="leading-relaxed">${t}</li>`).join('')}
+                    </ul>
+                  </div>
+                ` : ''}
+                ${ch.exercise ? `
+                  <div class="p-4 rounded-xl bg-cyan-950/20 border border-cyan-800/40 space-y-2.5">
+                    <span class="text-xs font-bold text-cyan-400 flex items-center">
+                      <i class="fa-solid fa-laptop-code mr-1.5"></i>Chapter ${ch.chapter} Challenge
+                    </span>
+                    <div class="text-xs text-slate-200 font-sans">${formatChapterMarkdown(ch.exercise)}</div>
+                    ${ch.solution ? `
+                      <div class="pt-2 flex flex-col space-y-2">
+                        <div class="flex items-center space-x-2">
+                          <button onclick="toggleChapterSolution(${ch.chapter})" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[11px] font-semibold text-cyan-300 border border-slate-700">
+                            <span id="sol-btn-label-${ch.chapter}">Show Solution</span>
+                          </button>
+                          ${hasSql ? `
+                            <button onclick="runChapterSolutionInPlayground(${ch.chapter})" class="px-2.5 py-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white text-[11px] font-bold">
+                              Run in Playground
+                            </button>
+                          ` : ''}
+                        </div>
+                        <div id="sol-box-${ch.chapter}" class="hidden mt-2 p-3 rounded-lg bg-slate-950 border border-emerald-900/50 text-xs text-slate-300 font-mono whitespace-pre-wrap">
+                          ${ch.solution}
+                        </div>
+                      </div>
+                    ` : ''}
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+  } else {
+    // Fallback if no chapters property
+    let sectionsHTML = "";
+    if (lesson.sections && lesson.sections.length > 0) {
+      sectionsHTML = lesson.sections.map((s, sIdx) => `
+        <div class="space-y-3 bg-slate-950/70 p-5 rounded-xl border border-slate-800 shadow-md">
+          <h4 class="text-sm sm:text-base font-bold text-white flex items-center">
+            <i class="fa-solid fa-layer-group text-cyan-400 mr-2.5"></i>${s.heading}
+          </h4>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">${s.content}</p>
+          ${s.diagram ? `
+            <pre class="bg-slate-950 p-4 rounded-xl border border-cyan-900/40 font-mono text-[11px] text-cyan-300 overflow-x-auto"><code>${s.diagram}</code></pre>
+          ` : ''}
+        </div>
+      `).join("");
+    }
+    chapterBodyHTML = sectionsHTML;
+  }
+
+  // 4. Multi-Cloud Real-World Case Study
   let cloudHTML = "";
   if (lesson.cloudCaseStudy) {
     cloudHTML = `
@@ -738,96 +1098,76 @@ function openLessonModal(weekNum) {
     `;
   }
 
-  const body = document.getElementById('modal-lesson-body');
-  body.innerHTML = `
-    <!-- Lesson Header Card -->
-    <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 p-5 rounded-xl border border-slate-800 space-y-3 shadow-lg">
-      <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
-        <div class="flex items-center space-x-2 text-cyan-400 font-semibold">
-          <i class="fa-solid fa-clock"></i>
-          <span>Estimated Reading Time: ${lesson.time}</span>
+  // 5. Module Capstone Section (Cloud Study, Master Code, Pitfalls, Quiz)
+  let capstoneHTML = `
+    <div id="module-capstone-section" class="border-t border-slate-800 pt-6 space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center">
+          <i class="fa-solid fa-trophy text-amber-400 mr-2"></i>Module Capstone & Production Practice
+        </h3>
+        <span class="text-xs text-slate-500 font-mono">Week ${weekNum} of 24</span>
+      </div>
+
+      <!-- Cloud Big Data Case Study -->
+      ${cloudHTML}
+
+      <!-- Executable Practical Code Block -->
+      <div class="space-y-3 bg-slate-950 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
+        <div class="bg-slate-800/90 px-4 py-3 flex flex-wrap items-center justify-between gap-2 border-b border-slate-700">
+          <span class="text-xs sm:text-sm font-bold text-cyan-300 flex items-center">
+            <i class="fa-solid fa-terminal mr-2 text-cyan-400"></i>${lesson.codeTitle}
+          </span>
+          <div class="flex items-center space-x-2">
+            <button onclick="navigator.clipboard.writeText(LESSON_DETAILS[${weekNum}].code); alert('SQL Query copied to clipboard!');" 
+              class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition-all flex items-center">
+              <i class="fa-regular fa-copy mr-1.5"></i>Copy SQL
+            </button>
+            <button onclick="runLessonCodeInPlayground(${weekNum})" class="px-3.5 py-1 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition-all flex items-center shadow-md">
+              <i class="fa-solid fa-play mr-1.5"></i>Run in SQL Playground
+            </button>
+          </div>
         </div>
-        ${lesson.cloudDataset ? `
-          <div class="px-2.5 py-1 rounded-full bg-cyan-950/90 text-cyan-300 border border-cyan-800 text-[11px] font-semibold flex items-center">
-            <i class="fa-solid fa-database mr-1.5 text-cyan-400"></i>${lesson.cloudDataset}
+        <pre class="p-4 font-mono text-xs text-cyan-200 overflow-x-auto bg-slate-950 leading-relaxed"><code>${lesson.code}</code></pre>
+        ${lesson.codeExplanation ? `
+          <div class="p-4 bg-slate-900/50 border-t border-slate-800/80 text-xs text-slate-300 leading-relaxed space-y-1">
+            <span class="font-bold text-cyan-400 flex items-center"><i class="fa-solid fa-code-compare mr-1.5"></i>Step-by-Step Query Breakdown:</span>
+            <p>${lesson.codeExplanation}</p>
           </div>
         ` : ''}
       </div>
-      <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans">${lesson.overview}</p>
-    </div>
 
-    <!-- Multi-Section Deep-Dive Theory -->
-    <div class="space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center">
-          <i class="fa-solid fa-book-bookmark text-cyan-400 mr-2"></i>In-Depth Architectural Textbook Guide
-        </h3>
-        <span class="text-xs text-slate-500 font-mono">Module ${weekNum} of 24</span>
+      <!-- Senior DBA Pitfalls & Production Advice -->
+      <div class="p-5 rounded-xl bg-amber-950/20 border border-amber-800/40 text-amber-200 text-xs space-y-2">
+        <div class="font-bold text-sm flex items-center"><i class="fa-solid fa-triangle-exclamation text-amber-400 mr-2"></i>Senior Staff DBA Pitfalls & Production Insights</div>
+        <div class="leading-relaxed text-slate-300 text-xs sm:text-sm">${lesson.pitfalls}</div>
       </div>
-      ${sectionsHTML}
-    </div>
 
-    <!-- Cloud Big Data Case Study -->
-    ${cloudHTML}
-
-    <!-- Executable Practical Code Block -->
-    <div class="space-y-3 bg-slate-950 rounded-xl border border-slate-800 overflow-hidden shadow-xl">
-      <div class="bg-slate-800/90 px-4 py-3 flex flex-wrap items-center justify-between gap-2 border-b border-slate-700">
-        <span class="text-xs sm:text-sm font-bold text-cyan-300 flex items-center">
-          <i class="fa-solid fa-terminal mr-2 text-cyan-400"></i>${lesson.codeTitle}
-        </span>
-        <div class="flex items-center space-x-2">
-          <button onclick="navigator.clipboard.writeText(LESSON_DETAILS[${weekNum}].code); alert('SQL Query copied to clipboard!');" 
-            class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition-all flex items-center">
-            <i class="fa-regular fa-copy mr-1.5"></i>Copy SQL
-          </button>
-          <button onclick="runLessonCodeInPlayground(${weekNum})" class="px-3.5 py-1 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition-all flex items-center shadow-md">
-            <i class="fa-solid fa-play mr-1.5"></i>Run in SQL Playground
-          </button>
+      <!-- Interactive Knowledge Check Quiz -->
+      <div class="p-5 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
+        <h4 class="text-xs font-bold text-white uppercase tracking-wider flex items-center">
+          <i class="fa-solid fa-circle-question text-cyan-400 mr-2"></i>Interactive Knowledge Check Quiz
+        </h4>
+        <p class="text-xs sm:text-sm text-slate-200 font-semibold">${lesson.quiz.question}</p>
+        <div class="space-y-2 pt-1" id="quiz-options-container">
+          ${lesson.quiz.options.map((opt, oIdx) => `
+            <button onclick="answerLessonQuiz(${weekNum}, ${oIdx})" id="quiz-opt-${oIdx}" 
+              class="w-full text-left p-3 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-300 hover:border-cyan-500 hover:text-white transition-all flex items-center justify-between">
+              <span class="pr-2">${opt}</span>
+              <span class="text-[10px] text-slate-500 font-mono shrink-0">Option ${oIdx + 1}</span>
+            </button>
+          `).join("")}
         </div>
+        <div id="quiz-feedback" class="hidden p-3 rounded-lg text-xs font-mono"></div>
       </div>
-      <pre class="p-4 font-mono text-xs text-cyan-200 overflow-x-auto bg-slate-950 leading-relaxed"><code>${lesson.code}</code></pre>
-      ${lesson.codeExplanation ? `
-        <div class="p-4 bg-slate-900/50 border-t border-slate-800/80 text-xs text-slate-300 leading-relaxed space-y-1">
-          <span class="font-bold text-cyan-400 flex items-center"><i class="fa-solid fa-code-compare mr-1.5"></i>Step-by-Step Query Breakdown:</span>
-          <p>${lesson.codeExplanation}</p>
-        </div>
-      ` : ''}
-    </div>
-
-    <!-- Senior DBA Pitfalls & Production Advice -->
-    <div class="p-5 rounded-xl bg-amber-950/20 border border-amber-800/40 text-amber-200 text-xs space-y-2">
-      <div class="font-bold text-sm flex items-center"><i class="fa-solid fa-triangle-exclamation text-amber-400 mr-2"></i>Senior Staff DBA Pitfalls & Production Insights</div>
-      <div class="leading-relaxed text-slate-300 text-xs sm:text-sm">${lesson.pitfalls}</div>
-    </div>
-
-    <!-- Interactive Knowledge Check Quiz -->
-    <div class="p-5 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
-      <h4 class="text-xs font-bold text-white uppercase tracking-wider flex items-center">
-        <i class="fa-solid fa-circle-question text-cyan-400 mr-2"></i>Interactive Knowledge Check Quiz
-      </h4>
-      <p class="text-xs sm:text-sm text-slate-200 font-semibold">${lesson.quiz.question}</p>
-      <div class="space-y-2 pt-1" id="quiz-options-container">
-        ${lesson.quiz.options.map((opt, oIdx) => `
-          <button onclick="answerLessonQuiz(${weekNum}, ${oIdx})" id="quiz-opt-${oIdx}" 
-            class="w-full text-left p-3 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-300 hover:border-cyan-500 hover:text-white transition-all flex items-center justify-between">
-            <span class="pr-2">${opt}</span>
-            <span class="text-[10px] text-slate-500 font-mono shrink-0">Option ${oIdx + 1}</span>
-          </button>
-        `).join("")}
-      </div>
-      <div id="quiz-feedback" class="hidden p-3 rounded-lg text-xs font-mono"></div>
     </div>
   `;
 
-  // Update navigation buttons
-  document.getElementById('modal-prev-btn').disabled = (weekNum === 1);
-  document.getElementById('modal-prev-btn').style.opacity = (weekNum === 1) ? "0.4" : "1.0";
-  document.getElementById('modal-next-btn').disabled = (weekNum === 24);
-  document.getElementById('modal-next-btn').style.opacity = (weekNum === 24) ? "0.4" : "1.0";
-
-  updateModalCompleteBtnState();
-  modal.classList.remove('hidden');
+  body.innerHTML = `
+    ${headerHTML}
+    ${chapterNavHTML}
+    ${chapterBodyHTML}
+    ${capstoneHTML}
+  `;
 }
 
 function closeLessonModal() {
@@ -899,8 +1239,6 @@ function runLessonCodeInPlayground(weekNum) {
   switchTab('playground');
   executeSQLQuery();
 }
-
-// ------------------------------------------------------------------------
 // 10. Hands-On Labs Renderer
 // ------------------------------------------------------------------------
 let activeLabId = "lab1";

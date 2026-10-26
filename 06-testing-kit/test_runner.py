@@ -364,6 +364,35 @@ class TestSuiteRunner:
         except Exception as e:
             self.log_result("Comprehensive Course Lessons Verification", False, str(e))
 
+    def test_ten_chapters_per_lesson(self):
+        try:
+            lessons_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "web-platform", "lessons-data.js")
+            with open(lessons_file, "r") as f:
+                content = f.read()
+
+            import json
+            s_idx = content.find("{")
+            e_idx = content.rfind("}") + 1
+            data = json.loads(content[s_idx:e_idx])
+
+            total_weeks = len(data)
+            all_have_10_chapters = all(
+                "chapters" in w and len(w["chapters"]) >= 10 for w in data.values()
+            )
+            all_have_exercises = all(
+                all("exercise" in ch and "solution" in ch for ch in w["chapters"])
+                for w in data.values()
+            )
+            passed = (total_weeks == 24) and all_have_10_chapters and all_have_exercises
+
+            self.log_result(
+                "10-Chapter Masterclass Verification (Zero-Knowledge Course)",
+                passed,
+                f"All 24 weeks verified with >=10 chapters each (240+ total chapters with exercises & solutions)."
+            )
+        except Exception as e:
+            self.log_result("10-Chapter Masterclass Verification", False, str(e))
+
     def run_all(self):
         print_header("MYSQL PRO TEST RUNNER: EXECUTING UNIT & INTEGRATION TESTS")
         start = time.time()
@@ -377,6 +406,7 @@ class TestSuiteRunner:
         self.test_financial_ledger_conservation()
         self.test_negative_balance_check_constraint()
         self.test_comprehensive_course_lessons()
+        self.test_ten_chapters_per_lesson()
 
         elapsed = time.time() - start
         total = self.tests_passed + self.tests_failed
