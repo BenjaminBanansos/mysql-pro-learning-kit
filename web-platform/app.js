@@ -5,8 +5,9 @@
  */
 
 let db = null;
-let currentTab = 'curriculum';
-let activeModalWeek = 1;
+let currentTab = 'lessons';
+let activeInlineChapter = 1;
+let activeModalChapter = 1;
 
 // ------------------------------------------------------------------------
 // 1. Curriculum Structure (10 Core Master Chapters)
@@ -788,7 +789,14 @@ function toggleChapterProgress(chapterNum) {
   const savedProgress = JSON.parse(localStorage.getItem('mysql_pro_progress') || '{}');
   savedProgress[`ch_${chapterNum}`] = !savedProgress[`ch_${chapterNum}`];
   localStorage.setItem('mysql_pro_progress', JSON.stringify(savedProgress));
+  renderLessonSidebar();
+  renderTopChapterPills(activeInlineChapter);
   renderCurriculum();
+  updateProgressStats();
+  if (activeInlineChapter === chapterNum) {
+    const reader = document.getElementById('lesson-reader-container');
+    if (reader) reader.innerHTML = generateChapterFullHTML(chapterNum, true);
+  }
   updateModalCompleteBtnState();
 }
 
@@ -810,25 +818,14 @@ function updateProgressStats() {
 
   const trackerBar = document.getElementById('tracker-bar');
   if (trackerBar) trackerBar.style.width = `${pct}%`;
+
+  const sidebarProgress = document.getElementById('lesson-sidebar-progress');
+  if (sidebarProgress) sidebarProgress.innerText = `${completed}/10 Done`;
 }
 
 // ------------------------------------------------------------------------
-// 9. 10-Chapter Masterclass Modal Controls
+// 9. 10-Chapter Masterclass Inline Reader & Navigation
 // ------------------------------------------------------------------------
-let activeModalChapter = 1;
-
-function initModalWeekSelector() {
-  const sel = document.getElementById('modal-week-selector');
-  if (!sel || sel.children.length > 0) return;
-  for (let c = 1; c <= 10; c++) {
-    const l = LESSON_DETAILS[c];
-    const opt = document.createElement('option');
-    opt.value = c;
-    opt.innerText = l ? `Chapter ${c}: ${l.badge}` : `Chapter ${c}`;
-    sel.appendChild(opt);
-  }
-}
-
 function formatChapterMarkdown(md) {
   if (!md) return '';
   let s = md
@@ -836,8 +833,7 @@ function formatChapterMarkdown(md) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-  // Code blocks: ```(lang)?
-([\s\S]*?)```
+  // Code blocks: ```(lang)?\n([\s\S]*?)```
   s = s.replace(/```([a-zA-Z0-9_\-]*)?\n([\s\S]*?)```/g, (match, lang, code) => {
     const l = lang ? lang.toUpperCase() : 'SQL';
     return `<div class="my-3 rounded-xl overflow-hidden border border-slate-700 bg-slate-950 shadow-md">
@@ -912,49 +908,39 @@ function toggleChapterSolution(chNum) {
   }
 }
 
-function openLessonModal(chapterNum) {
-  chapterNum = parseInt(chapterNum) || 1;
-  if (chapterNum < 1) chapterNum = 1;
-  if (chapterNum > 10) chapterNum = 10;
-  activeModalChapter = chapterNum;
-
+function generateChapterFullHTML(chapterNum, isInline = true) {
   const lesson = LESSON_DETAILS[chapterNum];
-  if (!lesson) return;
+  if (!lesson) return `<div class="p-8 text-center text-slate-400">Chapter ${chapterNum} not found.</div>`;
 
-  initModalWeekSelector();
-  const weekSel = document.getElementById('modal-week-selector');
-  if (weekSel) weekSel.value = chapterNum;
-
-  const modal = document.getElementById('lesson-modal');
-  document.getElementById('modal-month-badge').innerText = `Chapter ${chapterNum} of 10 • ${lesson.badge}`;
-  document.getElementById('modal-lesson-title').innerText = lesson.title;
-
-  const body = document.getElementById('modal-lesson-body');
-  if (!body) return;
+  const savedProgress = JSON.parse(localStorage.getItem('mysql_pro_progress') || '{}');
+  const isDone = !!savedProgress[`ch_${chapterNum}`];
 
   // 1. Navigation Pills Bar (Chapters 1 to 10)
   const pillsHTML = `
-    <div class="space-y-2">
+    <div class="space-y-2 border-b border-slate-800 pb-4">
       <div class="flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider">
         <span class="flex items-center">
           <i class="fa-solid fa-layer-group text-cyan-400 mr-2"></i>10-Chapter Masterclass
         </span>
         <span class="text-[11px] font-mono text-cyan-400">Chapter ${chapterNum} of 10</span>
       </div>
-      <div class="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-thin">
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
         ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(c => {
           const l = LESSON_DETAILS[c];
           const isActive = (c === chapterNum);
           const shortName = l ? l.badge : `Ch ${c}`;
+          const isChDone = !!savedProgress[`ch_${c}`];
+          const navFn = isInline ? `renderInlineLessonReader(${c})` : `openLessonModal(${c})`;
           return `
-            <button onclick="openLessonModal(${c})" 
-              class="px-3 py-1.5 rounded-lg text-xs whitespace-nowrap transition-all flex items-center space-x-1.5 shrink-0 ${
+            <button onclick="${navFn}" 
+              class="px-2.5 py-1.5 rounded-lg text-xs whitespace-nowrap transition-all flex items-center space-x-1.5 shrink-0 ${
                 isActive 
                   ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold shadow-md shadow-cyan-950 border border-cyan-400' 
-                  : 'bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-slate-800'
+                  : 'bg-slate-950/80 hover:bg-slate-800 text-slate-300 border border-slate-800'
               }">
-              <span class="font-mono text-[10px] px-1.5 py-0.2 rounded ${isActive ? 'bg-white/20' : 'bg-slate-800'}">Ch ${c}</span>
-              <span class="truncate max-w-[130px] sm:max-w-[160px]">${shortName}</span>
+              <span class="font-mono text-[10px] px-1 py-0.2 rounded ${isActive ? 'bg-white/20' : 'bg-slate-800'}">Ch ${c}</span>
+              <span class="truncate max-w-[120px] sm:max-w-[150px]">${shortName}</span>
+              ${isChDone ? '<i class="fa-solid fa-check text-[10px] text-emerald-400 ml-1"></i>' : ''}
             </button>
           `;
         }).join('')}
@@ -964,40 +950,41 @@ function openLessonModal(chapterNum) {
 
   // 2. Chapter Header Card
   const headerHTML = `
-    <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3 shadow-lg">
+    <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 p-6 rounded-2xl border border-slate-800 space-y-3 shadow-lg">
       <div class="flex flex-wrap items-center justify-between gap-2.5 text-xs">
-        <div class="flex items-center space-x-2 text-cyan-400 font-semibold">
-          <i class="fa-solid fa-clock"></i>
-          <span>Study Duration: ${lesson.time || '50 min study'}</span>
+        <div class="flex items-center space-x-2">
+          <span class="px-2.5 py-1 text-xs font-bold rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800">Chapter ${chapterNum} of 10</span>
+          <span class="text-slate-400 font-mono"><i class="fa-solid fa-clock text-cyan-400 mr-1.5"></i>${lesson.time || '50 min study'}</span>
         </div>
         ${lesson.cloudDataset ? `
-          <div class="px-2.5 py-1 rounded-full bg-cyan-950/90 text-cyan-300 border border-cyan-800 text-[11px] font-semibold flex items-center">
+          <div class="px-3 py-1 rounded-full bg-cyan-950/90 text-cyan-300 border border-cyan-800 text-xs font-semibold flex items-center shadow-sm">
             <i class="fa-solid fa-cloud-arrow-down mr-1.5 text-cyan-400"></i>${lesson.cloudDataset}
           </div>
         ` : ''}
       </div>
-      <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans">${lesson.overview}</p>
+      <h2 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight">${lesson.title}</h2>
+      <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-sans">${lesson.overview}</p>
     </div>
   `;
 
   // 3. Chapter Body Content
   const contentHTML = `
-    <div class="space-y-5 bg-slate-950/80 p-5 sm:p-6 rounded-2xl border border-slate-800 shadow-xl">
-      <div class="chapter-content text-xs sm:text-sm text-slate-200 leading-relaxed space-y-3 font-sans">
+    <div class="space-y-6 bg-slate-950/90 p-5 sm:p-7 rounded-2xl border border-slate-800 shadow-xl">
+      <div class="chapter-content text-xs sm:text-sm text-slate-200 leading-relaxed space-y-4 font-sans">
         ${formatChapterMarkdown(lesson.content)}
       </div>
 
       ${lesson.diagram ? `
-        <div class="my-4">
-          <div class="text-[11px] font-bold uppercase tracking-wider text-cyan-400 mb-1.5 flex items-center">
-            <i class="fa-solid fa-diagram-project mr-1.5"></i>Architecture & Data Flow Diagram
+        <div class="my-5">
+          <div class="text-xs font-bold uppercase tracking-wider text-cyan-400 mb-2 flex items-center">
+            <i class="fa-solid fa-diagram-project mr-2"></i>Architecture & Data Flow Diagram
           </div>
-          <pre class="bg-slate-950 p-4 rounded-xl border border-cyan-900/50 font-mono text-[11px] sm:text-xs text-cyan-300 overflow-x-auto shadow-inner leading-relaxed"><code>${lesson.diagram}</code></pre>
+          <pre class="bg-slate-950 p-4 sm:p-5 rounded-xl border border-cyan-900/60 font-mono text-[11px] sm:text-xs text-cyan-300 overflow-x-auto shadow-inner leading-relaxed"><code>${lesson.diagram}</code></pre>
         </div>
       ` : ''}
 
       ${lesson.takeaways && lesson.takeaways.length > 0 ? `
-        <div class="my-4 space-y-2 bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+        <div class="my-5 space-y-2 bg-slate-900/80 p-5 rounded-xl border border-slate-800">
           <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center">
             <i class="fa-solid fa-key mr-2 text-cyan-400"></i>Key Rules & Invariants:
           </span>
@@ -1008,7 +995,7 @@ function openLessonModal(chapterNum) {
       ` : ''}
 
       ${lesson.exercise ? `
-        <div class="my-4 p-5 rounded-xl bg-gradient-to-r from-cyan-950/30 via-slate-900 to-slate-950 border border-cyan-800/60 shadow-lg space-y-3">
+        <div class="my-5 p-5 sm:p-6 rounded-xl bg-gradient-to-r from-cyan-950/30 via-slate-900 to-slate-950 border border-cyan-800/70 shadow-lg space-y-3.5">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center">
               <i class="fa-solid fa-laptop-code text-cyan-400 mr-2"></i>Chapter ${chapterNum} Hands-On Challenge
@@ -1046,37 +1033,14 @@ function openLessonModal(chapterNum) {
           ` : ''}
         </div>
       ` : ''}
-
-      <!-- Bottom Stepper -->
-      <div class="flex items-center justify-between pt-4 border-t border-slate-800">
-        <button onclick="openLessonModal(${chapterNum - 1})" ${chapterNum === 1 ? 'disabled class="opacity-30 cursor-not-allowed px-3.5 py-1.5 rounded-lg text-xs bg-slate-800 text-slate-400"' : 'class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all flex items-center"'} >
-          <i class="fa-solid fa-arrow-left mr-1.5"></i>Previous Chapter (Ch ${chapterNum - 1})
-        </button>
-        <div class="hidden sm:flex items-center space-x-1">
-          ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(c => `
-            <button onclick="openLessonModal(${c})" class="w-6 h-6 rounded-full text-[10px] font-mono font-bold flex items-center justify-center transition-all ${c === chapterNum ? 'bg-cyan-500 text-white shadow' : 'bg-slate-800 text-slate-400 hover:text-white'}">
-              ${c}
-            </button>
-          `).join('')}
-        </div>
-        ${chapterNum < 10 ? `
-          <button onclick="openLessonModal(${chapterNum + 1})" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-cyan-600 hover:bg-cyan-500 text-white transition-all flex items-center shadow-md">
-            Next Chapter (Ch ${chapterNum + 1})<i class="fa-solid fa-arrow-right ml-1.5"></i>
-          </button>
-        ` : `
-          <button onclick="toggleChapterProgress(10); alert('Congratulations on completing all 10 Chapters of MySQL Pro!');" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all flex items-center shadow-md">
-            Finish Course<i class="fa-solid fa-graduation-cap ml-1.5"></i>
-          </button>
-        `}
-      </div>
     </div>
   `;
 
-  // 4. Case Study, Practical Code Block, Pitfalls & Quiz
+  // 4. Case Study, Code Snippet, Pitfalls, Quiz
   let capstoneHTML = "";
-  if (lesson.cloudCaseStudy || lesson.code || lesson.quiz) {
+  if (lesson.cloudCaseStudy || lesson.code || lesson.quiz || lesson.pitfalls) {
     capstoneHTML = `
-      <div class="border-t border-slate-800 pt-6 space-y-6">
+      <div class="space-y-6 pt-2">
         ${lesson.cloudCaseStudy ? `
           <div class="bg-gradient-to-r from-slate-950 via-indigo-950/20 to-slate-950 p-5 rounded-xl border border-indigo-900/50 space-y-2.5">
             <div class="flex items-center justify-between">
@@ -1148,43 +1112,196 @@ function openLessonModal(chapterNum) {
     `;
   }
 
-  body.innerHTML = `
+  // 5. Bottom Stepper
+  const navFn = isInline ? 'renderInlineLessonReader' : 'openLessonModal';
+  const stepperHTML = `
+    <div class="flex flex-wrap items-center justify-between gap-3 pt-6 border-t border-slate-800">
+      <button onclick="${navFn}(${chapterNum - 1})" ${chapterNum === 1 ? 'disabled class="opacity-30 cursor-not-allowed px-3.5 py-2 rounded-xl text-xs bg-slate-800 text-slate-400"' : 'class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all flex items-center shadow"'}>
+        <i class="fa-solid fa-arrow-left mr-2"></i>Previous Chapter (Ch ${chapterNum - 1})
+      </button>
+
+      <button onclick="toggleChapterProgress(${chapterNum})" 
+        class="px-5 py-2 rounded-xl text-xs font-bold transition-all shadow-md flex items-center ${isDone ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-cyan-600 hover:bg-cyan-500 text-white'}">
+        <i class="fa-solid ${isDone ? 'fa-circle-check' : 'fa-check'} mr-2"></i>
+        ${isDone ? 'Completed (Click to Reset)' : 'Mark Chapter Completed'}
+      </button>
+
+      ${chapterNum < 10 ? `
+        <button onclick="${navFn}(${chapterNum + 1})" class="px-4 py-2 rounded-xl text-xs font-bold bg-cyan-600 hover:bg-cyan-500 text-white transition-all flex items-center shadow-md">
+          Next Chapter (Ch ${chapterNum + 1})<i class="fa-solid fa-arrow-right ml-2"></i>
+        </button>
+      ` : `
+        <button onclick="toggleChapterProgress(10); alert('Congratulations on completing all 10 Chapters of MySQL Pro Academy!');" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all flex items-center shadow-md">
+          Graduate Course<i class="fa-solid fa-graduation-cap ml-2"></i>
+        </button>
+      `}
+    </div>
+  `;
+
+  return `
     ${pillsHTML}
     ${headerHTML}
     ${contentHTML}
     ${capstoneHTML}
+    ${stepperHTML}
   `;
+}
 
-  // Update navigation buttons
-  document.getElementById('modal-prev-btn').disabled = (chapterNum === 1);
-  document.getElementById('modal-prev-btn').style.opacity = (chapterNum === 1) ? "0.4" : "1.0";
-  document.getElementById('modal-next-btn').disabled = (chapterNum === 10);
-  document.getElementById('modal-next-btn').style.opacity = (chapterNum === 10) ? "0.4" : "1.0";
+function renderInlineLessonReader(chapterNum) {
+  chapterNum = parseInt(chapterNum) || 1;
+  if (chapterNum < 1) chapterNum = 1;
+  if (chapterNum > 10) chapterNum = 10;
+  activeInlineChapter = chapterNum;
 
-  updateModalCompleteBtnState();
-  modal.classList.remove('hidden');
-  body.scrollTop = 0;
+  const container = document.getElementById('lesson-reader-container');
+  if (container) {
+    container.innerHTML = generateChapterFullHTML(chapterNum, true);
+  }
+
+  renderTopChapterPills(chapterNum);
+  renderLessonSidebar();
+  syncPlaygroundChapterChallenge(chapterNum);
+}
+
+function renderLessonSidebar() {
+  const sidebar = document.getElementById('lesson-sidebar-list');
+  if (!sidebar) return;
+
+  const savedProgress = JSON.parse(localStorage.getItem('mysql_pro_progress') || '{}');
+
+  sidebar.innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(c => {
+    const l = LESSON_DETAILS[c];
+    if (!l) return '';
+    const isActive = (c === activeInlineChapter);
+    const isDone = !!savedProgress[`ch_${c}`];
+
+    return `
+      <div onclick="renderInlineLessonReader(${c})" 
+        class="p-3 rounded-xl border cursor-pointer transition-all space-y-1.5 ${
+          isActive 
+            ? 'bg-gradient-to-r from-cyan-950/70 via-slate-900 to-slate-950 border-cyan-500 shadow-md shadow-cyan-950/50' 
+            : 'bg-slate-950/70 border-slate-800/80 hover:border-slate-700 hover:bg-slate-900/60'
+        }">
+        <div class="flex items-center justify-between gap-1.5">
+          <div class="flex items-center space-x-2 overflow-hidden">
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold shrink-0 ${isActive ? 'bg-cyan-500 text-slate-950' : 'bg-slate-800 text-cyan-400 border border-slate-700'}">Ch ${c}</span>
+            <span class="text-xs font-bold truncate ${isActive ? 'text-white' : 'text-slate-300'}">${l.badge}</span>
+          </div>
+          <input type="checkbox" ${isDone ? 'checked' : ''} onclick="event.stopPropagation(); toggleChapterProgress(${c});" 
+            class="h-4 w-4 rounded border-slate-700 text-cyan-500 focus:ring-cyan-400 bg-slate-900 cursor-pointer shrink-0" title="Toggle Completion">
+        </div>
+        <div class="text-[11px] text-slate-400 line-clamp-2 leading-snug">
+          ${l.title.replace(/^Chapter \d+:\s*/, '')}
+        </div>
+        <div class="flex items-center justify-between text-[10px] text-slate-500 pt-0.5 font-mono">
+          <span><i class="fa-solid fa-clock text-cyan-500 mr-1"></i>${l.time || '50m'}</span>
+          <span class="text-cyan-400 truncate max-w-[130px]"><i class="fa-solid fa-cloud mr-1"></i>${l.cloudDataset ? l.cloudDataset.split('•')[0].trim() : 'Cloud'}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  updateProgressStats();
+}
+
+function renderTopChapterPills(activeCh) {
+  const container = document.getElementById('lesson-top-pills');
+  if (!container) return;
+
+  const savedProgress = JSON.parse(localStorage.getItem('mysql_pro_progress') || '{}');
+
+  container.innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(c => {
+    const l = LESSON_DETAILS[c];
+    const isActive = (c === activeCh);
+    const isDone = !!savedProgress[`ch_${c}`];
+    return `
+      <button onclick="renderInlineLessonReader(${c})" 
+        class="px-3 py-1.5 rounded-lg text-xs font-mono font-semibold transition-all flex items-center space-x-1 shrink-0 ${
+          isActive 
+            ? 'bg-cyan-500 text-slate-950 shadow-md font-bold' 
+            : 'bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800'
+        }">
+        <span>Ch ${c}</span>
+        ${isDone ? '<i class="fa-solid fa-check text-[10px] text-emerald-400 ml-1"></i>' : ''}
+      </button>
+    `;
+  }).join('');
+}
+
+function initPlaygroundChapterSelector() {
+  const sel = document.getElementById('playground-chapter-selector');
+  if (!sel || sel.children.length > 0) return;
+
+  for (let c = 1; c <= 10; c++) {
+    const l = LESSON_DETAILS[c];
+    const opt = document.createElement('option');
+    opt.value = c;
+    opt.innerText = l ? `Ch ${c}: ${l.badge}` : `Chapter ${c}`;
+    sel.appendChild(opt);
+  }
+
+  syncPlaygroundChapterChallenge(activeInlineChapter || 1);
+}
+
+function syncPlaygroundChapterChallenge(chapterNum) {
+  chapterNum = parseInt(chapterNum) || 1;
+  const sel = document.getElementById('playground-chapter-selector');
+  if (sel) sel.value = chapterNum;
+
+  const textEl = document.getElementById('playground-challenge-text');
+  const lesson = LESSON_DETAILS[chapterNum];
+  if (textEl && lesson) {
+    textEl.innerHTML = `<strong>Challenge:</strong> ${lesson.exercise ? lesson.exercise.split('\n')[0] : 'Master the chapter query patterns.'}`;
+  }
+}
+
+function loadCurrentChapterChallengeQuery() {
+  const sel = document.getElementById('playground-chapter-selector');
+  const ch = sel ? parseInt(sel.value) : activeInlineChapter;
+  const lesson = LESSON_DETAILS[ch];
+  if (!lesson) return;
+
+  const queryToLoad = lesson.code || lesson.solution;
+  if (queryToLoad) {
+    const editor = document.getElementById('sql-editor');
+    if (editor) editor.value = queryToLoad.trim();
+    executeSQLQuery();
+  }
+}
+
+function readCurrentChapterLessonFromPlayground() {
+  const sel = document.getElementById('playground-chapter-selector');
+  const ch = sel ? parseInt(sel.value) : activeInlineChapter;
+  switchTab('lessons');
+  renderInlineLessonReader(ch);
+}
+
+function openLessonModal(chapterNum) {
+  chapterNum = parseInt(chapterNum) || 1;
+  switchTab('lessons');
+  renderInlineLessonReader(chapterNum);
 }
 
 function closeLessonModal() {
-  document.getElementById('lesson-modal').classList.add('hidden');
+  const modal = document.getElementById('lesson-modal');
+  if (modal) modal.classList.add('hidden');
 }
 
 function prevLesson() {
-  if (activeModalChapter > 1) {
-    openLessonModal(activeModalChapter - 1);
+  if (activeInlineChapter > 1) {
+    renderInlineLessonReader(activeInlineChapter - 1);
   }
 }
 
 function nextLesson() {
-  if (activeModalChapter < 10) {
-    openLessonModal(activeModalChapter + 1);
+  if (activeInlineChapter < 10) {
+    renderInlineLessonReader(activeInlineChapter + 1);
   }
 }
 
 function updateModalCompleteBtnState() {
   const savedProgress = JSON.parse(localStorage.getItem('mysql_pro_progress') || '{}');
-  const isDone = !!savedProgress[`ch_${activeModalChapter}`];
+  const isDone = !!savedProgress[`ch_${activeInlineChapter}`];
   const btn = document.getElementById('modal-complete-btn');
   if (!btn) return;
 
@@ -1198,7 +1315,7 @@ function updateModalCompleteBtnState() {
 }
 
 function toggleCurrentModalComplete() {
-  toggleChapterProgress(activeModalChapter);
+  toggleChapterProgress(activeInlineChapter);
 }
 
 function answerLessonQuiz(chapterNum, selectedIdx) {
@@ -1218,13 +1335,15 @@ function answerLessonQuiz(chapterNum, selectedIdx) {
     }
   });
 
-  feedback.classList.remove('hidden');
-  if (isCorrect) {
-    feedback.className = "p-3 rounded-lg text-xs font-sans bg-emerald-950/60 border border-emerald-800 text-emerald-300 block";
-    feedback.innerHTML = `<strong>Correct!</strong> ${lesson.quiz.explanation}`;
-  } else {
-    feedback.className = "p-3 rounded-lg text-xs font-sans bg-red-950/60 border border-red-800 text-red-300 block";
-    feedback.innerHTML = `<strong>Not quite:</strong> ${lesson.quiz.explanation}`;
+  if (feedback) {
+    feedback.classList.remove('hidden');
+    if (isCorrect) {
+      feedback.className = "p-3 rounded-lg text-xs font-sans bg-emerald-950/60 border border-emerald-800 text-emerald-300 block";
+      feedback.innerHTML = `<strong>Correct!</strong> ${lesson.quiz.explanation}`;
+    } else {
+      feedback.className = "p-3 rounded-lg text-xs font-sans bg-red-950/60 border border-red-800 text-red-300 block";
+      feedback.innerHTML = `<strong>Not quite:</strong> ${lesson.quiz.explanation}`;
+    }
   }
 }
 
@@ -1392,8 +1511,13 @@ function switchTab(tabId) {
   if (activeContent) activeContent.classList.remove('hidden');
   if (activeBtn) activeBtn.classList.add('active');
 
-  if (tabId === 'playground' && !document.getElementById('sql-editor').value) {
-    loadSampleQueryText("SELECT * FROM customers LIMIT 10;");
+  if (tabId === 'lessons') {
+    renderInlineLessonReader(activeInlineChapter || 1);
+  } else if (tabId === 'playground') {
+    initPlaygroundChapterSelector();
+    if (!document.getElementById('sql-editor').value) {
+      loadSampleQueryText("SELECT * FROM customers LIMIT 10;");
+    }
   }
 }
 
@@ -1414,6 +1538,9 @@ document.addEventListener('keydown', (e) => {
 // App Bootstrap
 window.addEventListener('DOMContentLoaded', () => {
   initDatabase();
+  renderLessonSidebar();
+  renderInlineLessonReader(1);
+  initPlaygroundChapterSelector();
   renderCurriculum();
   renderLabs();
   renderPortfolio();
