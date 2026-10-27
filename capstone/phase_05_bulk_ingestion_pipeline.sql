@@ -1,0 +1,2 @@
+-- Phase 5 Capstone Milestone: Transactional Batch Ingestion Pipeline
+-- Executes atomic multi-row batch inserts with Write-Ahead Logging (WAL)

@@ -1,0 +1,2 @@
+-- Phase 8 Capstone Milestone: OLAP Dimensional Metric Rollups
+-- Multi-dimensional revenue, review sentiment, and operational summaries

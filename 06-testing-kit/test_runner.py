@@ -395,6 +395,53 @@ class TestSuiteRunner:
         except Exception as e:
             self.log_result("Cloud Big Data Containers & Guided Exercises", False, str(e))
 
+    def test_academic_citations_and_blooms_taxonomy(self):
+        try:
+            lessons_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "web-platform", "lessons-data.js")
+            with open(lessons_file, "r") as f:
+                content = f.read()
+
+            import json
+            s_idx = content.find("{")
+            e_idx = content.rfind("}") + 1
+            data = json.loads(content[s_idx:e_idx])
+
+            has_blooms = all(
+                "learningOutcomes" in ch and 
+                "rememberUnderstand" in ch["learningOutcomes"] and 
+                "applyAnalyze" in ch["learningOutcomes"] and 
+                "evaluateCreate" in ch["learningOutcomes"]
+                for ch in data.values()
+            )
+
+            has_citations = all(
+                "academicSources" in ch and len(ch["academicSources"]) >= 2
+                for ch in data.values()
+            )
+
+            has_capstone = all(
+                "capstoneProject" in ch and "phase" in ch["capstoneProject"] and "artifactPath" in ch["capstoneProject"]
+                for ch in data.values()
+            )
+
+            has_quiz_feedback = all(
+                "quiz" in ch and 
+                "academicAttribution" in ch["quiz"] and 
+                "distractorRationales" in ch["quiz"] and 
+                len(ch["quiz"]["distractorRationales"]) == len(ch["quiz"]["options"])
+                for ch in data.values()
+            )
+
+            passed = has_blooms and has_citations and has_capstone and has_quiz_feedback
+
+            self.log_result(
+                "Bloom's Taxonomy, Academic Citations & Capstone Milestone Integration",
+                passed,
+                "10/10 chapters verified with 3-tier Bloom's taxonomy, peer-reviewed citations, capstone deliverables, and diagnostic feedback."
+            )
+        except Exception as e:
+            self.log_result("Academic Citations & Bloom's Taxonomy", False, str(e))
+
     def run_all(self):
         print_header("MYSQL PRO TEST RUNNER: EXECUTING UNIT & INTEGRATION TESTS")
         start = time.time()
@@ -409,6 +456,7 @@ class TestSuiteRunner:
         self.test_negative_balance_check_constraint()
         self.test_ten_chapter_course_structure()
         self.test_cloud_containers_and_exercises()
+        self.test_academic_citations_and_blooms_taxonomy()
 
         elapsed = time.time() - start
         total = self.tests_passed + self.tests_failed

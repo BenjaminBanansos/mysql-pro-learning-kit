@@ -1186,7 +1186,7 @@ function generateChapterFullHTML(chapterNum, isInline = true) {
       <div class="flex flex-wrap items-center justify-between gap-2.5 text-xs">
         <div class="flex items-center space-x-2">
           <span class="px-2.5 py-1 text-xs font-bold rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800">Chapter ${chapterNum} of 10</span>
-          <span class="text-slate-400 font-mono"><i class="fa-solid fa-clock text-cyan-400 mr-1.5"></i>${lesson.time || '50 min study'}</span>
+          <span class="text-slate-400 font-mono"><i class="fa-solid fa-clock text-cyan-400 mr-1.5"></i>${lesson.time || '2 hours study'}</span>
         </div>
         ${lesson.cloudDataset ? `
           <div class="px-3 py-1 rounded-full bg-cyan-950/90 text-cyan-300 border border-cyan-800 text-xs font-semibold flex items-center shadow-sm">
@@ -1198,6 +1198,111 @@ function generateChapterFullHTML(chapterNum, isInline = true) {
       <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-sans">${lesson.overview}</p>
     </div>
   `;
+
+  // 2B. Bloom's Revised Taxonomy Learning Outcomes Card
+  let learningOutcomesHTML = "";
+  if (lesson.learningOutcomes) {
+    learningOutcomesHTML = `
+      <div class="bg-slate-900/90 rounded-2xl border border-slate-800 p-5 sm:p-6 space-y-4 shadow-lg">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <div class="flex items-center space-x-2">
+            <div class="w-7 h-7 rounded-lg bg-cyan-950 border border-cyan-800 flex items-center justify-center text-cyan-400 text-xs">
+              <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div>
+              <h3 class="text-xs sm:text-sm font-bold text-white uppercase tracking-wider">Bloom's Revised Taxonomy: Module Learning Outcomes</h3>
+              <p class="text-[11px] text-slate-400">Target Competency: <span class="text-cyan-300 font-semibold">${lesson.targetRoles || 'Data Engineering & DBA'}</span></p>
+            </div>
+          </div>
+          <span class="text-[10px] font-mono px-2.5 py-1 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800 font-bold">
+            University Specialization Caliber
+          </span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs">
+          <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2">
+            <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider flex items-center">
+              <i class="fa-solid fa-brain mr-1.5"></i>1. Remember & Understand
+            </span>
+            <ul class="space-y-1.5 text-slate-300 text-[11px] leading-relaxed list-disc list-inside">
+              ${lesson.learningOutcomes.rememberUnderstand.map(i => `<li>${i}</li>`).join("")}
+            </ul>
+          </div>
+          <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2">
+            <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-wider flex items-center">
+              <i class="fa-solid fa-calculator mr-1.5"></i>2. Apply & Analyze
+            </span>
+            <ul class="space-y-1.5 text-slate-300 text-[11px] leading-relaxed list-disc list-inside">
+              ${lesson.learningOutcomes.applyAnalyze.map(i => `<li>${i}</li>`).join("")}
+            </ul>
+          </div>
+          <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2">
+            <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider flex items-center">
+              <i class="fa-solid fa-hammer mr-1.5"></i>3. Evaluate & Create
+            </span>
+            <ul class="space-y-1.5 text-slate-300 text-[11px] leading-relaxed list-disc list-inside">
+              ${lesson.learningOutcomes.evaluateCreate.map(i => `<li>${i}</li>`).join("")}
+            </ul>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // 2C. Academic Foundations & Canonical Literature
+  let academicSourcesHTML = "";
+  if (lesson.academicSources && lesson.academicSources.length > 0) {
+    academicSourcesHTML = `
+      <div class="bg-slate-900/80 rounded-2xl border border-slate-800 p-5 space-y-3.5 shadow-md">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+          <span class="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center">
+            <i class="fa-solid fa-book-bookmark text-indigo-400 mr-2 text-sm"></i>Academic Foundations & Canonical Literature
+          </span>
+          <span class="text-[10px] font-mono text-indigo-300 bg-indigo-950 border border-indigo-800 px-2 py-0.5 rounded">
+            Peer-Reviewed CS Citations
+          </span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          ${lesson.academicSources.map(s => `
+            <div class="bg-slate-950/90 p-3.5 rounded-xl border border-slate-800/90 space-y-1.5 flex flex-col justify-between">
+              <div class="space-y-1">
+                <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-indigo-950/80 text-indigo-300 border border-indigo-800/60 inline-block">${s.type}</span>
+                <p class="text-xs font-semibold text-slate-200 font-serif leading-snug">${s.citation}</p>
+              </div>
+              <p class="text-[11px] text-slate-400 leading-relaxed font-sans pt-1 border-t border-slate-900">${s.keyConcept}</p>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  // 2D. Capstone Project Milestone Banner
+  let capstoneMilestoneHTML = "";
+  if (lesson.capstoneProject) {
+    capstoneMilestoneHTML = `
+      <div class="bg-gradient-to-r from-emerald-950/40 via-slate-900 to-indigo-950/40 rounded-2xl border border-emerald-800/60 p-4 sm:p-5 shadow-lg space-y-2.5">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center space-x-2">
+            <span class="px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] font-mono font-bold uppercase tracking-wider">
+              <i class="fa-solid fa-cubes mr-1 text-emerald-400"></i>Capstone Milestone: ${lesson.capstoneProject.phase}
+            </span>
+            <span class="text-xs font-bold text-white">${lesson.capstoneProject.title}</span>
+          </div>
+          <span class="text-[11px] font-mono text-cyan-400 bg-slate-950 px-2.5 py-1 rounded border border-slate-800 flex items-center">
+            <i class="fa-regular fa-file-code mr-1.5 text-cyan-400"></i>${lesson.capstoneProject.artifactPath}
+          </span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
+          <div class="text-slate-300 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80">
+            <strong class="text-emerald-400">Deliverable:</strong> ${lesson.capstoneProject.deliverable}
+          </div>
+          <div class="text-slate-300 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80">
+            <strong class="text-cyan-400">Acceptance Test:</strong> ${lesson.capstoneProject.verification}
+          </div>
+        </div>
+      </div>
+    `;
+  }
 
   // 3. Chapter Body Content
   const contentHTML = `
@@ -1373,6 +1478,9 @@ function generateChapterFullHTML(chapterNum, isInline = true) {
   return `
     ${pillsHTML}
     ${headerHTML}
+    ${learningOutcomesHTML}
+    ${academicSourcesHTML}
+    ${capstoneMilestoneHTML}
     ${contentHTML}
     ${capstoneHTML}
     ${stepperHTML}
@@ -1561,20 +1669,54 @@ function answerLessonQuiz(chapterNum, selectedIdx) {
     const optBtn = document.getElementById(`quiz-opt-${idx}`);
     if (!optBtn) return;
     if (idx === lesson.quiz.answer) {
-      optBtn.className = "w-full text-left p-2.5 rounded-lg bg-emerald-950/80 border border-emerald-600 text-xs text-emerald-200 transition-all flex items-center justify-between";
+      optBtn.className = "w-full text-left p-3 rounded-lg bg-emerald-950/90 border border-emerald-500 text-xs text-emerald-200 transition-all flex items-center justify-between shadow";
     } else if (idx === selectedIdx) {
-      optBtn.className = "w-full text-left p-2.5 rounded-lg bg-red-950/80 border border-red-600 text-xs text-red-200 transition-all flex items-center justify-between";
+      optBtn.className = "w-full text-left p-3 rounded-lg bg-red-950/90 border border-red-500 text-xs text-red-200 transition-all flex items-center justify-between";
     }
   });
 
   if (feedback) {
     feedback.classList.remove('hidden');
+    let distractorText = "";
+    if (!isCorrect && lesson.quiz.distractorRationales && lesson.quiz.distractorRationales[selectedIdx]) {
+      distractorText = `
+        <div class="mt-2.5 p-2.5 rounded-lg bg-amber-950/70 border border-amber-800/80 text-amber-200 text-xs leading-relaxed">
+          <strong class="text-amber-300"><i class="fa-solid fa-circle-exclamation mr-1.5"></i>Conceptual Misconception Identified (Option ${selectedIdx + 1}):</strong>
+          <div class="mt-1">${lesson.quiz.distractorRationales[selectedIdx]}</div>
+        </div>
+      `;
+    }
+
+    let academicBox = "";
+    if (lesson.quiz.academicAttribution) {
+      academicBox = `
+        <div class="mt-2.5 p-2.5 rounded-lg bg-indigo-950/80 border border-indigo-700/80 text-indigo-200 text-xs font-mono">
+          <i class="fa-solid fa-graduation-cap text-cyan-400 mr-2"></i><strong>Academic Citation:</strong> ${lesson.quiz.academicAttribution}
+        </div>
+      `;
+    }
+
     if (isCorrect) {
-      feedback.className = "p-3 rounded-lg text-xs font-sans bg-emerald-950/60 border border-emerald-800 text-emerald-300 block";
-      feedback.innerHTML = `<strong>Correct!</strong> ${lesson.quiz.explanation}`;
+      feedback.className = "p-4 rounded-xl text-xs font-sans bg-emerald-950/80 border border-emerald-700 text-emerald-100 block space-y-2 shadow-lg";
+      feedback.innerHTML = `
+        <div class="flex items-center space-x-2 text-sm font-bold text-emerald-400">
+          <i class="fa-solid fa-circle-check text-base"></i>
+          <span>Correct Answer Verified!</span>
+        </div>
+        <p class="text-xs leading-relaxed text-slate-200">${lesson.quiz.explanation}</p>
+        ${academicBox}
+      `;
     } else {
-      feedback.className = "p-3 rounded-lg text-xs font-sans bg-red-950/60 border border-red-800 text-red-300 block";
-      feedback.innerHTML = `<strong>Not quite:</strong> ${lesson.quiz.explanation}`;
+      feedback.className = "p-4 rounded-xl text-xs font-sans bg-red-950/80 border border-red-700 text-red-100 block space-y-2 shadow-lg";
+      feedback.innerHTML = `
+        <div class="flex items-center space-x-2 text-sm font-bold text-red-400">
+          <i class="fa-solid fa-circle-xmark text-base"></i>
+          <span>Diagnostic Feedback: Concept Review Recommended</span>
+        </div>
+        <p class="text-xs leading-relaxed text-slate-200">${lesson.quiz.explanation}</p>
+        ${distractorText}
+        ${academicBox}
+      `;
     }
   }
 }

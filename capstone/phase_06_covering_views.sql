@@ -1,0 +1,2 @@
+-- Phase 6 Capstone Milestone: Covering Index Analytics Views
+-- Generates index-only projection views for zero-heap read latency

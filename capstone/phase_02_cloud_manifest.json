@@ -1,0 +1,30 @@
+{
+  "project": "Multi-Cloud Autonomous Enterprise Data Warehouse",
+  "version": "2.0.0",
+  "sources": [
+    {
+      "provider": "AWS S3",
+      "uri": "s3://amazon-reviews-pds/tsv/",
+      "format": "TSV/Parquet",
+      "records": "130M+"
+    },
+    {
+      "provider": "AWS S3",
+      "uri": "s3://nyc-tlc/trip data/",
+      "format": "Parquet",
+      "records": "1.5B+"
+    },
+    {
+      "provider": "Google BigQuery",
+      "uri": "bigquery-public-data.github_repos",
+      "format": "Columnar",
+      "records": "10M+"
+    },
+    {
+      "provider": "Hugging Face",
+      "uri": "hf://datasets/HuggingFaceFW/fineweb",
+      "format": "Parquet",
+      "records": "15T Tokens"
+    }
+  ]
+}

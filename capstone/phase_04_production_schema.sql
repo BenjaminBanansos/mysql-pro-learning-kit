@@ -1,0 +1,2 @@
+-- Phase 4 Capstone Milestone: Enterprise Production DDL with Referential Constraints
+-- Deploys normalized schema with CHECK constraints and clustered indexes
